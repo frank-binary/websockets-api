@@ -1,5 +1,7 @@
 # Binary.com Websockets API Reference.
 
+[![Join the chat at https://gitter.im/binary-com/websockets-api](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/binary-com/websockets-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Overview
 
 * [Open a WebSocket](https://github.com/binary-com/websockets-api/wiki/Open-a-WebSocket)
