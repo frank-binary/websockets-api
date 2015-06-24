@@ -1,0 +1,41 @@
+
+body                { font: 62.5% "Trebuchet MS", sans-serif } /* sets 1em == 10px */
+
+div#header a img    { height: 120px }
+.left               { float: left }
+.right              { float: right }
+div#inhead          { margin: 0px 10px 0px 40px }
+div#inhead2         { text-align: right }
+div.octal-notice          { padding: 0.2em 0.8em }
+div.octal-notice .ui-icon { margin-right: 0.3em }
+div.octal-notice p        { margin: .3em 0 }
+.local-content      { padding: 8px }
+#themeswitcher-ctr  { width: 188px }
+
+span.bigtext { font-size: 1.75em }
+div.inputzone { margin: 12px; width: 320px }
+div.butonzone { margin: 12px; display: inline-block }
+div.innerzone { padding: 12px }
+div.innerzone .ui-state-active { color: #f00 }
+div.buttonset    { display: inline-block; margin-bottom: 6px }
+
+div#symbolbuts   { display: none }
+div#durationflds { display: none }
+div#payoutflds   { display: none }
+div#contractbuts { display: none }
+div#startflds    { display: none }
+
+div#barriers            { margin-top: 8px }
+div.cts                 { display: none }
+div.contract            { float: left; width: 220px; height: 220px; padding: 6px }
+div.contract .contract_header
+                        { height: 50px }
+div.contract .error     { display: none }
+div.contract .longcode  { font-style: italic }
+div.contract div        { margin: 2px 0 0 0 }
+div.contract div.elbow  { display: inline-block; width: 60px; text-align: right; margin-right: 12px }
+
+input.thininput         { width: 60px }
+div#rangeslider         { width: 200px }
+#slider1, #slider2      { margin-top: 12px }
+
