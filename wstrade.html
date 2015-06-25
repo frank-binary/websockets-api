@@ -30,9 +30,7 @@
         </div>
 
         <div class="right" id="inhead2">
-            <div id="name"></div>
-            <div id="account"></div>
-            <div id="currency"></div>
+            <div id="xidentity"></div>
         </div>
 
         <div class="ui-widget-content ui-corner-all" id="buthalf">
@@ -51,6 +49,7 @@
                     <button class="button" icon="ui-icon-cancel" size="huge">Start</button>
                     &nbsp;
                     <input class="ui-corner-all" type="password" placeholder="API Token Required" id="token" name="token"/>
+                    <div id="identity"></div>
                 </div>
             </form>
         </div>
@@ -486,7 +485,7 @@
                         alert(data.error);
                         return;
                     }
-                    onauthorized();
+                    onauthorized(data);
                     return;
                 }
                 if (data.ticks) {
@@ -851,8 +850,11 @@
                 g.ws.send(JSON.stringify({authorize:g.token}));
             }
 
-            function onauthorized() {
-                console.log("authorized.");
+            function onauthorized(data) {
+                var identity = data.loginid + '<br/>' + (data.fullname||'') + '<br/>' + data.currency;
+                console.log("authorized." + identity);
+                $('#token').hide();
+                $('#identity').html(identity);
                 var $but = $('#pauseit_form button');
                 $but.prop('started', true);
                 $('span.ui-button-text', $but).text('Pause');

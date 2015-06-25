@@ -5,7 +5,7 @@ div#header a img    { height: 120px }
 .left               { float: left }
 .right              { float: right }
 div#inhead          { margin: 0px 10px 0px 20px }
-div#inhead2         { margin: 12px 8px 0px 0px; text-align: right }
+div#identity        { display: inline-block }
 div.octal-notice          { padding: 0.2em 0.8em }
 div.octal-notice .ui-icon { margin-right: 0.3em }
 div.octal-notice p        { margin: .3em 0 }
