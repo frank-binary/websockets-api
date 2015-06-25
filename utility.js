@@ -1,5 +1,5 @@
 
-// octal.js
+// utility.js
 
 function buttonmaker() {
     var $this = $(this);
@@ -18,11 +18,8 @@ function buttonmaker() {
 
 function init0() {
     $('.button').each(buttonmaker);
-    if (0) {
-        $('#themeswitcher').themeswitcher({height:'900px'});
-    }
 }
-$(init0);
+//$(init0);
 
 /************************
 prepare a 'timespinner' widget extension to 'spinner'

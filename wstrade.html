@@ -38,24 +38,26 @@
         <div class="ui-widget-content ui-corner-all" id="buthalf">
             <form id="pricing_form" style="display:inline-block">
                 <div class="butonzone buttonset">
-                    <button class="button" icon="ui-icon-refresh" size="huge">Get Price</button>
+                    <button class="button online" icon="ui-icon-refresh" size="huge">Get Price</button>
                 </div>
             </form>
             <form id="portfol_form" style="display:inline-block">
                 <div class="butonzone buttonset">
-                    <button class="button" icon="ui-icon-suitcase" size="huge">Portfolio</button>
+                    <button class="button online" icon="ui-icon-suitcase" size="huge">Portfolio</button>
                 </div>
             </form>
             <form id="pauseit_form" style="display:inline-block">
                 <div class="butonzone buttonset">
-                    <button class="button" icon="ui-icon-cancel" size="huge">Pause</button>
+                    <button class="button" icon="ui-icon-cancel" size="huge">Start</button>
+                    &nbsp;
+                    <input class="ui-corner-all" type="password" placeholder="API Token Required" id="token" name="token"/>
                 </div>
             </form>
         </div>
 
         <div class="ui-widget-content ui-corner-all ui-helper-clearfix">
             <div class="left inputzone">
-                <button id="select_symbol" type="button" class="button" rcon="ui-icon-arrowthickstop-1-s">
+                <button id="select_symbol" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                 <span id="display_name">Trading</span>&hellip;</button>
                 <div class="innerzone ui-state-highlight" id="symbolbuts" title="Choose Symbol">
                     Retrieving tradeable symbols..
@@ -63,7 +65,7 @@
             </div>
             <div class="left inputzone">
                 <div>
-                    <button id="select_contract" type="button" class="button" rcon="ui-icon-arrowthickstop-1-s">
+                    <button id="select_contract" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                     <span id="contract_name">Contract Type</span>&hellip;
                     </button>
                 </div>
@@ -164,7 +166,7 @@
             </div>
             <div class="left inputzone">
                 <div>
-                    <button id="select_payout" type="button" class="button" rcon="ui-icon-arrowthickstop-1-s">
+                    <button id="select_payout" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                     <span id="payout_name">Contract Value</span>&hellip;
                     </button>
                 </div>
@@ -198,7 +200,7 @@
             </div>
             <div class="left inputzone">
                 <div>
-                    <button id="select_start" type="button" class="button" rcon="ui-icon-arrowthickstop-1-s">
+                    <button id="select_start" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                     <span id="start_str">Starting..</span>&hellip;
                     </button>
                 </div>
@@ -235,7 +237,7 @@
             </div>
             <div class="left inputzone">
                 <div>
-                    <button id="select_duration" type="button" class="button" rcon="ui-icon-arrowthickstop-1-s">
+                    <button id="select_duration" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                     <span id="duration_str">Contract Duration</span>&hellip;
                     </button>
                 </div>
@@ -478,8 +480,15 @@
             }
             function onmessage(m) {
                 var data = JSON.parse(m.data);
-                /*console.log('got message %o', data);*/
-                console.log('%o', data);
+                console.log('incoming message %o', data);
+                if (data.authorize) {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    onauthorized();
+                    return;
+                }
                 if (data.ticks) {
                     var symbol = data.ticks;
                     var $live_symbol = g.$live_symbols[symbol];
@@ -641,21 +650,28 @@
             function pauseit_submit(e) {
                 var $but = $('#pauseit_form button');
                 var newText;
-                if ($but.prop('paused')) {
+                if (!$but.prop('started')) {
+                    g.token = $('#token').val();
+                    if (g.token) {
+                        console.log("starting websocket..");
+                        opensocket({onclose:onclose,onmessage:onmessage,onopen:onopen});
+                    } else {
+                        alert('API Token Required');
+                    }
+                } else if ($but.prop('paused')) {
                     $but.prop('paused', false);
                     newText = 'Pause';
                     console.log("resuming websocket..");
-                    opensocket({onclose:onclose,onmessage:onmessage,onopen:onreopen});
+                    opensocket({onclose:onclose,onmessage:onmessage,onopen:onopen});
                 } else {
-                    $('button.purchase').button('disable');
+                    $('.ui-button.online').button('disable');
                     $but.prop('paused', true);
                     newText = 'Resume';
                     g.ws.onclose = function(){};
                     console.log("shutting websocket..");
                     g.ws.close();
                 }
-                //$but.button('refresh');
-                $('span.ui-button-text', $but).text(newText);
+                if (newText) $('span.ui-button-text', $but).text(newText);
                 if (e) e.preventDefault();
             }
             function change_payout(e) {
@@ -825,21 +841,25 @@
                 } else {
                     //alert('Connection with Server closed with code' + ' ' + ev.code + (ev.reason?('('+ev.reason+')'):''));
                 }
-                $('button.purchase').button('disable');
-                window.setTimeout(opensocket, g.degrade*1000, {onclose:onclose,onmessage:onmessage,onopen:onreopen});
+                $('.ui-button.online').button('disable');
+                window.setTimeout(opensocket, g.degrade*1000, {onclose:onclose,onmessage:onmessage,onopen:onopen});
             }
 
-            function get_initial() {
-                console.log("socket open; getting initial data..");
-                g.ws.send(JSON.stringify({active_symbols:'display_name'}));
-            }
-
-            function onreopen() {
-                console.log("socket re-opened");
+            function onopen() {
                 delete g.degrade;
+                console.log("socket opened, authorize with " + g.token);
+                g.ws.send(JSON.stringify({authorize:g.token}));
+            }
+
+            function onauthorized() {
+                console.log("authorized.");
+                var $but = $('#pauseit_form button');
+                $but.prop('started', true);
+                $('span.ui-button-text', $but).text('Pause');
+                $('.ui-button.online').button('enable');
                 if (g.contracts_built > 0) return;
-                console.log("re-trying opening sequence");
-                get_initial();
+                console.log("running initialisation sequence");
+                g.ws.send(JSON.stringify({active_symbols:'display_name'}));
             }
 
             function opensocket(opts) {
@@ -901,8 +921,10 @@
                 $('#portfol_form').submit(portfol_submit);
                 $('#pauseit_form').submit(pauseit_submit);
 
-                // create a single socket..
-                opensocket({onclose:onclose,onmessage:onmessage,onopen:get_initial});
+                // make all buttons
+                $('.button').each(buttonmaker);
+                // but disable online ones until online
+                $('.ui-button.online').button('disable');
 
             }
             $(init);
