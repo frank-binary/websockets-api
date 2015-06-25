@@ -13,7 +13,7 @@ div.octal-notice p        { margin: .3em 0 }
 #themeswitcher-ctr  { width: 188px }
 
 span.bigtext { font-size: 1.75em }
-div.inputzone { margin: 12px; width: 320px }
+div.inputzone { margin: 12px }
 div.butonzone { margin: 12px; display: inline-block }
 div.innerzone { padding: 12px }
 div.innerzone .ui-state-active { color: #f00 }
