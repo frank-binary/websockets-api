@@ -851,7 +851,7 @@
             }
 
             function onauthorized(data) {
-                var identity = data.loginid + '<br/>' + (data.fullname||'') + '<br/>' + data.currency;
+                var identity = data.loginid + '<br/>' + (data.fullname||'');
                 console.log("authorized." + identity);
                 $('#token').hide();
                 $('#identity').html(identity);
