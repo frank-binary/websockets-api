@@ -29,10 +29,6 @@
             <h1>Multi-Contract Trading</h1>
         </div>
 
-        <div class="right" id="inhead2">
-            <div id="xidentity"></div>
-        </div>
-
         <div class="ui-widget-content ui-corner-all" id="buthalf">
             <form id="pricing_form" style="display:inline-block">
                 <div class="butonzone buttonset">
@@ -48,7 +44,9 @@
                 <div class="butonzone buttonset">
                     <button class="button" icon="ui-icon-cancel" size="huge">Start</button>
                     &nbsp;
-                    <input class="ui-corner-all" type="password" placeholder="API Token Required" id="token" name="token"/>
+                    <input class="ui-corner-all" type="password" placeholder="API Token Required" id="token" name="token"
+                    title="Supply a Binary.com API User Token (as found on the Settings page).  Stay logged in to Binary.com in another browser tab."
+                    />
                     <div id="identity"></div>
                 </div>
             </form>
@@ -876,6 +874,9 @@
             }
 
             function init() { 
+
+                // api token..
+                $('#token').tooltip({show:{effect:"slideDown",delay:250}});
 
                 // setup handlers and widgets..
                 $('#select_symbol')  .click(function(){$('#symbolbuts')  .toggle('medium')}); //dialog(position('#select_symbol'))});
