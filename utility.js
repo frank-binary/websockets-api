@@ -16,11 +16,6 @@ function buttonmaker() {
     if (size && size=='huge') $this.css({'font-size':'1.75em'});
 }
 
-function init0() {
-    $('.button').each(buttonmaker);
-}
-//$(init0);
-
 /************************
 prepare a 'timespinner' widget extension to 'spinner'
 as per http://jqueryui.com/spinner/#time
@@ -50,5 +45,27 @@ function dfmt(epoch) {
     var datestr = $.datepicker.formatDate('dd-M-yy', d);
     var timestr = pad0(d.getUTCHours()) + ':' + pad0(d.getUTCMinutes()) + ':' + pad0(d.getUTCSeconds());
     return timestr + ' ' + datestr
+}
+
+String.prototype.initCap = function(){
+    var s = this;
+    var r = this.replace(/(?:^|\s)[a-z]/g,function(m){return m.toUpperCase()});
+    console.log("initCap got " + s + ", gives " + r + ".");
+    return r;
+}
+
+// We need to upgrade to Globalize 1.0.  Till then:
+// http://freeda.dbnet.com.au/pub/globalize/0.1.1/examples/browser/
+function niceDayUTC(epochStr) {
+    var epoch = parseInt(epochStr) + g.timezone_offset;
+    return Globalize.format(new Date(epoch*1000), "dd-MMM-yyyy", 'en-GB');
+}
+function niceTimeUTC(epochStr) {
+    var epoch = parseInt(epochStr) + g.timezone_offset;
+    return Globalize.format(new Date(epoch*1000), "HH:mm:ss", 'en-GB');
+}
+function niceDate(epochStr) {
+    var d = new Date(parseInt(epochStr)*1000);
+    return Globalize.format(d, "dd-MMM-yyyy HH:mm:ss", 'en-GB');
 }
 

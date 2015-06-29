@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Contract Watch</title>
+    <title>Multi-Contract Trading</title>
     <link href="//code.jquery.com/ui/1.10.3/themes/pepper-grinder/jquery-ui.min.css" rel="stylesheet">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.4/jquery.mousewheel.min.js"></script>
@@ -12,8 +12,6 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/globalize/0.1.1/cultures/globalize.culture.en-US.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/globalize/0.1.1/cultures/globalize.culture.de-DE.js"></script>
     <script src="//code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
-    <script src="//cdn.datatables.net/1.10.2/js/jquery.dataTables.js"></script>
-    <script src="//cdn.datatables.net/plug-ins/725b2a2115b/integration/jqueryui/dataTables.jqueryui.js"></script>
 
     <link href="css/wstrade.css" rel="stylesheet">
     <script src="/utility.js"></script>
@@ -331,8 +329,9 @@
             //console.log("update with %o", data);
             for (fld in data) {
                 var $div = $('.'+fld, this.$div);
-                $div.html(data[fld]);
-                this.d0[fld] = data[fld];
+                var val = fld == 'basis'? data[fld].initCap(): data[fld];
+                $div.html(val);
+                this.d0[fld] = val;
             }
             if (data.payout) {
                 var cul = g.currency_cultures[this.d0.currency];
@@ -388,7 +387,7 @@
                     $('button.purchase', this.$div).hide();
                     $('span.error', this.$div).show();
                     var detail = data.detail || 
-                                ( (data.basis? (data.basis||' '): ''                          )
+                                ( (data.basis||' ')
                                 + (data.amount_str? (data.amount_str + ' '): ''               )
                                 + (data.duration && data.duration_unit? ('over '+data.duration+data.duration_unit+' '): '')
                                 + (data.data_start? ('starting '+niceDate(data.date_start)+' '): '' ) );
@@ -398,19 +397,7 @@
             g.Contract.prototype.destroy = function() {
                 this.$div && this.$div.remove();
             };
-            // http://freeda.dbnet.com.au/pub/globalize/0.1.1/examples/browser/
-            function niceDayUTC(epochStr) {
-                var epoch = parseInt(epochStr) + g.timezone_offset;
-                return Globalize.format(new Date(epoch*1000), "dd-MMM-yyyy", 'en-GB');
-            }
-            function niceTimeUTC(epochStr) {
-                var epoch = parseInt(epochStr) + g.timezone_offset;
-                return Globalize.format(new Date(epoch*1000), "HH:mm:ss", 'en-GB');
-            }
-            function niceDate(epochStr) {
-                var d = new Date(parseInt(epochStr)*1000);
-                return Globalize.format(d, "dd-MMM-yyyy HH:mm:ss", 'en-GB');
-            }
+
             function build_symbols(offerings) {
                 var buttonsets = '';
                 $.each(offerings.offerings, function(i, mkt) {
@@ -477,7 +464,7 @@
             }
             function onmessage(m) {
                 var data = JSON.parse(m.data);
-                console.log('incoming message %o', data);
+                //console.log('incoming message %o', data);
                 if (data.authorize) {
                     if (data.error) {
                         alert(data.error);
