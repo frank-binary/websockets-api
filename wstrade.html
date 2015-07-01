@@ -43,7 +43,7 @@
                     <button class="button" icon="ui-icon-cancel" size="huge">Start</button>
                     &nbsp;
                     <input class="ui-corner-all" type="password" placeholder="API Token Required" id="token" name="token"
-                    title="Supply a Binary.com API User Token (as found on the Settings page).  Stay logged in to Binary.com in another browser tab."
+title="Supply a Binary.com API User Token (as found on the Settings page).  Stay logged in to Binary.com in another browser tab.  If valid, this token will be remembered for next Start."
                     />
                     <div id="identity"></div>
                 </div>
@@ -842,6 +842,7 @@
                 $('#identity').html(identity);
                 var $but = $('#pauseit_form button');
                 $but.prop('started', true);
+                localStorage.setItem('token', g.token);
                 $('span.ui-button-text', $but).text('Pause');
                 $('.ui-button.online').button('enable');
                 if (g.contracts_built > 0) return;
@@ -863,6 +864,8 @@
             function init() { 
 
                 // api token..
+                g.token = localStorage.getItem('token');
+                if (g.token) $('#token').val(g.token);
                 $('#token').tooltip({show:{effect:"slideDown",delay:250}});
 
                 // setup handlers and widgets..

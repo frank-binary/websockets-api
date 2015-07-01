@@ -48,10 +48,7 @@ function dfmt(epoch) {
 }
 
 String.prototype.initCap = function(){
-    var s = this;
-    var r = this.replace(/(?:^|\s)[a-z]/g,function(m){return m.toUpperCase()});
-    console.log("initCap got " + s + ", gives " + r + ".");
-    return r;
+    return this.replace(/(?:^|\s)[a-z]/g,function(m){return m.toUpperCase()})
 }
 
 // We need to upgrade to Globalize 1.0.  Till then:
