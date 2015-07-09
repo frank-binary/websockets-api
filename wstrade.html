@@ -439,7 +439,6 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                 $('#payoutflds #amount_str').spinner('value', g.init_trade.amount_val); change_payout(0);
                 // first proposal..
                 $('#pricing_form').trigger("submit");
-                clear_notice('info');
             }
             function closesym(ev, ui) {
                 var symbol = ui.tooltip.data('symbol');
@@ -571,6 +570,7 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                     g.live_contracts[contract_id] = contract;
                     g.contracts_built++;
                     if (data.fmb_id) g.fmb_ids[data.fmb_id] = contract;
+                    clear_notice('info');
                 }
                 contract.update(data);
             }
