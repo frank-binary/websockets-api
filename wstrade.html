@@ -830,16 +830,6 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                     return
                 }
                 notice("Service Unavailable. Please ensure you are logged-in at binary.com, then retry this page.", 'error');
-                /*
-                if (ev.code==1006) {
-                    // this is the usual failure code, even for auth failure; message to be generic:
-                    // see http://dev.w3.org/html5/websockets/
-                    // and http://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
-                    alert('Connection with Server not currently available');
-                } else {
-                    alert('Connection with Server closed with code' + ' ' + ev.code + (ev.reason?('('+ev.reason+')'):''));
-                }
-                */
             }
 
             function onopen() {
@@ -859,7 +849,14 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                 localStorage.setItem('token', g.token);
                 $('span.ui-button-text', $but).text('Pause');
                 $('.ui-button.online').button('enable');
-                if (g.contracts_built > 0) return;
+                if (g.contracts_built > 0) {
+                    $.each(g.live_contracts, function(contract_id, contract) {
+                        contract.destroy();
+                    });
+                    g.fmb_ids = {};
+                    g.live_contracts = {};
+                    return;
+                }
                 console.log("running initialisation sequence");
                 g.ws.send(JSON.stringify({active_symbols:'display_name'}));
             }
