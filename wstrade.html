@@ -439,6 +439,7 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                 $('#payoutflds #amount_str').spinner('value', g.init_trade.amount_val); change_payout(0);
                 // first proposal..
                 $('#pricing_form').trigger("submit");
+                clear_notice('info');
             }
             function closesym(ev, ui) {
                 var symbol = ui.tooltip.data('symbol');
@@ -855,9 +856,10 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                     });
                     g.fmb_ids = {};
                     g.live_contracts = {};
+                    notice('Connection restored. Previous contract proposals were cancelled');
                     return;
                 }
-                console.log("running initialisation sequence");
+                notice("Getting latest market conditions from Binary.com");
                 g.ws.send(JSON.stringify({active_symbols:'display_name'}));
             }
 
