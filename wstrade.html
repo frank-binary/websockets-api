@@ -51,14 +51,14 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
         </div>
 
         <div class="ui-widget-content ui-corner-all ui-helper-clearfix">
-            <div class="left inputzone">
+            <div class="inputzone">
                 <button id="select_symbol" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                 <span id="display_name">Trading</span>&hellip;</button>
                 <div class="innerzone ui-state-highlight" id="symbolbuts" title="Choose Symbol">
                     Retrieving tradeable symbols..
                 </div>
             </div>
-            <div class="left inputzone">
+            <div class="inputzone">
                 <div>
                     <button id="select_contract" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                     <span id="contract_name">Contract Type</span>&hellip;
@@ -159,7 +159,7 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                     <input id="barrier_category" name="barrier_category" type="hidden" value="">
                 </div>
             </div>
-            <div class="left inputzone">
+            <div class="inputzone">
                 <div>
                     <button id="select_payout" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                     <span id="payout_name">Contract Value</span>&hellip;
@@ -193,7 +193,7 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                     </div>
                 </div>
             </div>
-            <div class="left inputzone">
+            <div class="inputzone">
                 <div>
                     <button id="select_start" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                     <span id="start_str">Starting..</span>&hellip;
@@ -230,7 +230,7 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                     <input id="date_start" name="date_start" type="hidden" value="0">
                 </div>
             </div>
-            <div class="left inputzone">
+            <div class="inputzone">
                 <div>
                     <button id="select_duration" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
                     <span id="duration_str">Contract Duration</span>&hellip;
@@ -267,6 +267,13 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
         </div>
     </div>
 
+    <div id="info-msg" class="ui-widget wstrade-notice ui-state-highlight ui-corner-all">
+        <p><span class="left ui-icon ui-icon-info"></span><span class="notice"></span></p>
+    </div>
+
+    <div id="error-msg" class="ui-widget wstrade-notice ui-state-error ui-corner-all">
+        <p><span class="left ui-icon ui-icon-alert"></span><span class="notice"></span></p>
+    </div>
 
     <div class="ui-widget ui-widget-content ui-corner-all" id="outhalf">
         <div class="ui-helper-clearfix" id="contracts">
@@ -498,7 +505,7 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                     return;
                 }
                 if (data.offerings) {
-                    console.log("offerings data is %o", data.offerings);
+                    console.log("offerings data is %o", data);
                     build_symbols(data.offerings);
                     return;
                 }
@@ -637,22 +644,22 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                 if (!$but.prop('started')) {
                     g.token = $('#token').val();
                     if (g.token) {
-                        console.log("starting websocket..");
-                        opensocket({onclose:onclose,onmessage:onmessage,onopen:onopen});
+                        notice('Opening connection to Binary.com');
+                        opensocket();
                     } else {
                         alert('API Token Required');
                     }
                 } else if ($but.prop('paused')) {
                     $but.prop('paused', false);
                     newText = 'Pause';
-                    console.log("resuming websocket..");
-                    opensocket({onclose:onclose,onmessage:onmessage,onopen:onopen});
+                    notice('Resuming connection to Binary.com');
+                    opensocket();
                 } else {
                     $('.ui-button.online').button('disable');
                     $but.prop('paused', true);
                     newText = 'Resume';
                     g.ws.onclose = function(){};
-                    console.log("shutting websocket..");
+                    notice('Closing connection to Binary.com');
                     g.ws.close();
                 }
                 if (newText) $('span.ui-button-text', $but).text(newText);
@@ -814,19 +821,25 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
             }
 
             function onclose(ev) {
-                if (g.degrade) g.degrade *= 1.2
-                else g.degrade = 1;
-                console.log("websocket closed with event %o.  Re-opening in " + g.degrade + ' secs', ev);
+                console.log("websocket closed with event %o.", ev);
+                if ($('#pauseit_form button').prop('started')) {
+                    if (g.degrade) g.degrade *= 1.2; else g.degrade = 1;
+                    notice("Connection lost.  Re-trying in " + g.degrade.round(1) + ' secs', 'error');
+                    $('.ui-button.online').button('disable');
+                    window.setTimeout(opensocket, g.degrade*1000);
+                    return
+                }
+                notice("Service unavailable.  Please login at binary.com, then retry.", 'error');
+                /*
                 if (ev.code==1006) {
                     // this is the usual failure code, even for auth failure; message to be generic:
                     // see http://dev.w3.org/html5/websockets/
                     // and http://stackoverflow.com/questions/18803971/websocket-onerror-how-to-read-error-description
-                    //alert('Connection with Server not currently available');
+                    alert('Connection with Server not currently available');
                 } else {
-                    //alert('Connection with Server closed with code' + ' ' + ev.code + (ev.reason?('('+ev.reason+')'):''));
+                    alert('Connection with Server closed with code' + ' ' + ev.code + (ev.reason?('('+ev.reason+')'):''));
                 }
-                $('.ui-button.online').button('disable');
-                window.setTimeout(opensocket, g.degrade*1000, {onclose:onclose,onmessage:onmessage,onopen:onopen});
+                */
             }
 
             function onopen() {
@@ -837,7 +850,8 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
 
             function onauthorized(data) {
                 var identity = data.loginid + '<br/>' + (data.fullname||'');
-                console.log("authorized." + identity);
+                clear_notice('info');
+                clear_notice('error');
                 $('#token').hide();
                 $('#identity').html(identity);
                 var $but = $('#pauseit_form button');
@@ -851,22 +865,31 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
             }
 
             function opensocket(opts) {
+                var handlers = {onclose:onclose,onmessage:onmessage,onopen:onopen};
                 g.ws  = new WebSocket('wss://ws.binary.com/websockets/contracts');
-                for (var opt in opts) {
-                    g.ws[opt] = opts[opt];
-                }
+                //g.ws  = new WebSocket('ws://www.devbin.io/websockets/contracts');
+                $.extend(g.ws, handlers, opts);
             }
 
             function position(of) {
                 return {width: '640px', position:{my:'left top', at: 'left bottom', of:of} /*, modal:true*/}
             }
 
-            function init() { 
+            function notice(text, level) {
+                if (!level) level = 'info';
+                var $div = $('#' + level + '-msg');
+                $('.notice', $div).text(text);
+                $div.show()
+            }
 
-                // api token..
-                g.token = localStorage.getItem('token');
-                if (g.token) $('#token').val(g.token);
-                $('#token').tooltip({show:{effect:"slideDown",delay:250}});
+            function clear_notice(level) {
+                if (!level) level = 'info';
+                var $div = $('#' + level + '-msg');
+                $('.notice', $div).text('');
+                $div.hide();
+            }
+
+            function init() { 
 
                 // setup handlers and widgets..
                 $('#select_symbol')  .click(function(){$('#symbolbuts')  .toggle('medium')}); //dialog(position('#select_symbol'))});
@@ -918,6 +941,16 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                 $('.button').each(buttonmaker);
                 // but disable online ones until online
                 $('.ui-button.online').button('disable');
+
+                // api token..
+                g.token = localStorage.getItem('token');
+                $('#token').tooltip({show:{effect:"slideDown",delay:250}});
+                if (g.token) {
+                    $('#token').val(g.token);
+                    notice('Welcome.');
+                } else {
+                    notice('Welcome.  Please log into Binary.com and retrieve an API Token');
+                }
 
             }
             $(init);

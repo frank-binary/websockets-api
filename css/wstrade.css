@@ -6,9 +6,9 @@ div#header a img    { height: 120px }
 .right              { float: right }
 div#inhead          { margin: 0px 10px 0px 20px }
 div#identity        { display: inline-block }
-div.octal-notice          { padding: 0.2em 0.8em }
-div.octal-notice .ui-icon { margin-right: 0.3em }
-div.octal-notice p        { margin: .3em 0 }
+div.wstrade-notice          { padding: 0.2em 0.8em; display: none }
+div.wstrade-notice .ui-icon { margin-right: 0.3em }
+div.wstrade-notice p        { margin: .3em 0 }
 .local-content      { padding: 8px }
 #themeswitcher-ctr  { width: 188px }
 
