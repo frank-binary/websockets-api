@@ -43,7 +43,7 @@ div.contract div        { margin: 2px 0 0 0 }
 div.contract div.elbow  { display: inline-block; width: 60px; text-align: right; margin-right: 12px }
 
 input.thininput         { width: 60px }
-input#token             { width: 180px }
+input#token             { width: 140px }
 div#rangeslider         { width: 200px }
 #slider1, #slider2      { margin-top: 12px }
 

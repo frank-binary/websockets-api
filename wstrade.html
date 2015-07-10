@@ -680,7 +680,7 @@
             function mytoken_submit(e) {
                 if (e) e.preventDefault();
                 if (!$('#token').val()) return;
-                $('button#clear_token').button('enable');
+                $('button#clear_token').show();
                 pauseit_submit();
             }
             function change_payout(e) {
@@ -865,7 +865,7 @@
                 $but.prop('started', true);
                 localStorage.setItem('token', g.token);
                 localStorage.setItem('identity', g.identity);
-                $('button#store_token').tooltip('close').button('disable');
+                $('button#store_token').tooltip('close').hide();
                 $('span.ui-button-text', $but).text('Pause');
                 $('.ui-button.online').button('enable');
                 if (g.contracts_built > 0) {
@@ -911,8 +911,8 @@
                 localStorage.removeItem('token');
                 localStorage.removeItem('identity');
                 $('#token').val('');
-                $('button#clear_token').tooltip('close').button('disable');
-                $('button#store_token').button('enable');
+                $('button#clear_token').hide();
+                $('button#store_token').show();
                 $('#identity').html('');
                 var $but = $('#pauseit_form button');
                 $but.removeProp('started');
@@ -995,10 +995,10 @@
                     $('#token').val(g.token);
                     $('#identity').html(g.identity);
                     notice('Welcome.');
-                    $('button#store_token').button('disable');
+                    $('button#store_token').hide();
                 } else {
                     notice('Welcome.  Please log into Binary.com and retrieve an API Token');
-                    $('button#clear_token').button('disable');
+                    $('button#clear_token').hide();
                 }
 
             }
