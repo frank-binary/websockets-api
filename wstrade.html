@@ -885,8 +885,8 @@
 
             function opensocket(opts) {
                 var handlers = {onclose:onclose,onmessage:onmessage,onopen:onopen};
-                //g.ws  = new WebSocket('wss://ws.binary.com/websockets/contracts');
-                g.ws  = new WebSocket('ws://www.devbin.io/websockets/contracts');
+                g.ws  = new WebSocket('wss://ws.binary.com/websockets/contracts');
+                //g.ws  = new WebSocket('ws://www.devbin.io/websockets/contracts');
                 $.extend(g.ws, handlers, opts);
             }
 
