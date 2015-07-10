@@ -2,7 +2,9 @@
 <html>
 <head>
     <title>Multi-Contract Trading</title>
-    <link href="//code.jquery.com/ui/1.10.3/themes/pepper-grinder/jquery-ui.min.css" rel="stylesheet">
+    <!--link href="//code.jquery.com/ui/1.10.3/themes/pepper-grinder/jquery-ui.min.css" rel="stylesheet" id="ui-theme"-->
+    <link href="css/jquery-ui.custom.css" rel="stylesheet" id="ui-theme">
+    <link href="//dbnet-public.s3.amazonaws.com/css/jquery.ui.themeswitcher.css" rel="stylesheet">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.4/jquery.mousewheel.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/globalize/0.1.1/globalize.min.js"></script>
@@ -12,6 +14,8 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/globalize/0.1.1/cultures/globalize.culture.en-US.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/globalize/0.1.1/cultures/globalize.culture.de-DE.js"></script>
     <script src="//code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+    <!--script src="//dbnet-public.s3.amazonaws.com/jquery.ui.themeswitcher.js"></script-->
+    <script src="/jquery.ui.themeswitcher.js"></script>
 
     <link href="css/wstrade.css" rel="stylesheet">
     <script src="/utility.js"></script>
@@ -19,260 +23,269 @@
 
 <body>
     <div id="header" class="ui-widget ui-widget-header ui-helper-clearfix ui-corner-all local-content">
+
+        <div id="themeswitcher"></div>
+
         <a href="https://www.binary.com">
-            <img class="left" title="Smart Prices.  Smart Trading" src="/img/binary-symbol-logo.svg"></img>
+            <img class="left ttip" title="Smart Prices.  Smart Trading" src="/img/binary-symbol-logo.svg"></img>
         </a>
 
         <div class="left" id="inhead">
             <h1>Multi-Contract Trading</h1>
-        </div>
 
-        <div class="ui-widget-content ui-corner-all" id="buthalf">
-            <form id="pricing_form" style="display:inline-block">
+            <form id="pricing_form">
                 <div class="butonzone buttonset">
                     <button class="button online" icon="ui-icon-refresh" size="huge">Get Price</button>
                 </div>
             </form>
-            <form id="portfol_form" style="display:inline-block">
+            <form id="portfol_form">
                 <div class="butonzone buttonset">
                     <button class="button online" icon="ui-icon-suitcase" size="huge">Portfolio</button>
                 </div>
             </form>
-            <form id="pauseit_form" style="display:inline-block">
+            <form id="pauseit_form">
                 <div class="butonzone buttonset">
                     <button class="button" icon="ui-icon-cancel" size="huge">Start</button>
-                    &nbsp;
-                    <input class="ui-corner-all" type="password" placeholder="API Token Required" id="token" name="token"
-title="Supply a Binary.com API User Token (as found on the Settings page).  Stay logged in to Binary.com in another browser tab.  If valid, this token will be remembered for next Start."
-                    />
-                    <div id="identity"></div>
                 </div>
             </form>
+
         </div>
 
-        <div class="ui-widget-content ui-corner-all ui-helper-clearfix">
-            <div class="inputzone">
-                <button id="select_symbol" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
-                <span id="display_name">Trading</span>&hellip;</button>
-                <div class="innerzone ui-state-highlight" id="symbolbuts" title="Choose Symbol">
-                    Retrieving tradeable symbols..
-                </div>
-            </div>
-            <div class="inputzone">
-                <div>
-                    <button id="select_contract" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
-                    <span id="contract_name">Contract Type</span>&hellip;
-                    </button>
-                </div>
-                <div class="innerzone ui-state-highlight" id="contractbuts" title="Contract Type">
-                    <div>
-                        <div class="buttonset">
-                            <input id="CALL-euro_atm" name="ct_bc" type="radio" value="CALL-euro_atm">
-                            <label ct="CALL" for="CALL-euro_atm">Rises</label>
-                            <input id="PUT-euro_atm" name="ct_bc" type="radio" value="PUT-euro_atm">
-                            <label ct="PUT" for="PUT-euro_atm">Falls</label>
-                        </div>
-                        <div class="buttonset">
-                            <input id="CALL-euro_non_atm" name="ct_bc" type="radio" value="CALL-euro_non_atm">
-                            <label ct="CALL" for="CALL-euro_non_atm">Higher</label>
-                            <input id="PUT-euro_non_atm" name="ct_bc" type="radio" value="PUT-euro_non_atm">
-                            <label ct="PUT" for="PUT-euro_non_atm">Lower</label>
-                        </div>
-                        <br/>
-                        <div class="buttonset">
-                            <input id="EXPIRYRANGE-euro_atm" name="ct_bc" type="radio" value="EXPIRYRANGE-euro_atm">
-                            <label ct="EXPIRYRANGE" for="EXPIRYRANGE-euro_atm">Ends Outside</label>
-                            <input id="EXPIRYMISS-euro_atm" name="ct_bc" type="radio" value="EXPIRYMISS-euro_atm">
-                            <label ct="EXPIRYMISS" for="EXPIRYMISS-euro_atm">Ends Between</label>
-                        </div>
-                        <br/>
-                        <div class="buttonset">
-                            <input id="RANGE-american" name="ct_bc" type="radio" value="RANGE-american">
-                            <label ct="RANGE" for="RANGE-american">Stays Between</label>
-                            <input id="UPORDOWN-american" name="ct_bc" type="radio" value="UPORDOWN-american">
-                            <label ct="UPORDOWN" for="UPORDOWN-american">Goes Outside</label>
-                        </div>
-                        <br/>
-                        <div class="buttonset">
-                            <input id="ONETOUCH-american" name="ct_bc" type="radio" value="ONETOUCH-american">
-                            <label ct="ONETOUCH" for="ONETOUCH-american">Touches</label>
-                            <input id="NOTOUCH-american" name="ct_bc" type="radio" value="NOTOUCH-american">
-                            <label ct="NOTOUCH" for="NOTOUCH-american">Does Not Touch</label>
-                        </div>
-                        <br/>
-                        <div class="buttonset">
-                            <input id="ASIANU-asian" name="ct_bc" type="radio" value="ASIANU-asian">
-                            <label ct="ASIANU" for="ASIANU-asian">Asian Up</label>
-                            <input id="ASIAND-asian" name="ct_bc" type="radio" value="ASIAND-asian">
-                            <label ct="ASIAND" for="ASIAND-asian">Asian Down</label>
-                        </div>
-                        <br/>
-                        <div class="buttonset">
-                            <input id="DIGITMATCH-non_financial" name="ct_bc" type="radio" value="DIGITMATCH-non_financial">
-                            <label ct="DIGITMATCH" for="DIGITMATCH-non_financial">Digit Matches</label>
-                            <input id="DIGITDIFF-non_financial" name="ct_bc" type="radio" value="DIGITDIFF-non_financial">
-                            <label ct="DIGITDIFF" for="DIGITDIFF-non_financial">Digit Differs</label>
-                        </div>
-                    </div>
-                    <div id="barriers">
-                        <div class="cts CALL PUT ONETOUCH NOTOUCH euro_non_atm american">
-                            <label for="barrier">Target Value</label>
-                            <input class="thininput" id="barrier" name="barrier" value="0">
-                            <div id="slider1"></div>
-                        </div>
-                        <div class="cts EXPIRYRANGE EXPIRYMISS RANGE UPORDOWN euro_non_atm american">
-                            <label for="barrier2">Low Barrier </label>
-                            <input class="thininput" id="barrier2" name="barrier2" value="-5">
-                            &mdash;
-                            <input class="thininput" id="barrier" name="barrier" value="5">
-                            <label for="barrier"> High Barrier</label>
-                            <div id="slider2"></div>
-                        </div>
-                        <div class="cts DIGITMATCH DIGITDIFF non_financial">
-                            Last Digit<br/><br/>
-                            <div class="buttonset">
-                                <input id="digit0" name="barrier" type="radio" value="0">
-                                <label for="digit0">0</label>
-                                <input id="digit1" name="barrier" type="radio" value="1">
-                                <label for="digit1">1</label>
-                                <input id="digit2" name="barrier" type="radio" value="2">
-                                <label for="digit2">2</label>
-                                <input id="digit3" name="barrier" type="radio" value="3">
-                                <label for="digit3">3</label>
-                                <input id="digit4" name="barrier" type="radio" value="4">
-                                <label for="digit4">4</label>
-                                <input id="digit5" name="barrier" type="radio" value="5">
-                                <label for="digit5">5</label>
-                                <input id="digit6" name="barrier" type="radio" value="6">
-                                <label for="digit6">6</label>
-                                <input id="digit7" name="barrier" type="radio" value="7">
-                                <label for="digit7">7</label>
-                                <input id="digit8" name="barrier" type="radio" value="8">
-                                <label for="digit8">8</label>
-                                <input id="digit9" name="barrier" type="radio" value="9">
-                                <label for="digit9">9</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="memo"></div>
-                    <input id="contract_type" name="contract_type" type="hidden" value="">
-                    <input id="barrier_category" name="barrier_category" type="hidden" value="">
-                </div>
-            </div>
-            <div class="inputzone">
-                <div>
-                    <button id="select_payout" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
-                    <span id="payout_name">Contract Value</span>&hellip;
-                    </button>
-                </div>
-                <div class="innerzone ui-state-highlight buttonset" id="payoutflds" title="Contract Value">
-                    <div class="buttonset">
-                        <input id="Payout" name="basis" type="radio" value="payout">
-                        <label for="Payout">Payout</label>
-                        <input id="Stake" name="basis" type="radio" value="stake">
-                        <label for="Stake">Stake</label>
-                    </div>
-                    <br/>
-                    <div class="buttonset" id="currencies">
-                        <input id="USD" name="currency" type="radio" value="USD">
-                        <label for="USD">USD</label>
-                        <input id="EUR" name="currency" type="radio" value="EUR">
-                        <label for="EUR">EUR</label>
-                        <input id="AUD" name="currency" type="radio" value="AUD">
-                        <label for="AUD">AUD</label>
-                        <input id="GBP" name="currency" type="radio" value="GBP">
-                        <label for="GBP">GBP</label>
-                        <input id="YEN" name="currency" type="radio" value="YEN">
-                        <label for="YEN">YEN</label>
-                    </div>
-                    <br/>
-                    <div>
-                        <input id="amount_str" name="amount_str" value="10">
-                        <label for="amount_str">Value</label>
-                        <input id="amount_val" name="amount_val" type="hidden" value="10">
-                    </div>
-                </div>
-            </div>
-            <div class="inputzone">
-                <div>
-                    <button id="select_start" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
-                    <span id="start_str">Starting..</span>&hellip;
-                    </button>
-                </div>
-                <div class="innerzone ui-state-highlight" id="startflds" title="Contract Starts">
-                    <div class="ui-helper-clearfix">
-                        <div class="left buttonset">
-                            <input id="start_immed" name="start_when" type="radio" value="start_immed">
-                            <label for="start_immed">Start Immediately</label>
-                            <input id="start_in" name="start_when" type="radio" value="start_in">
-                            <label for="start_in">Start In..</label>
-                            <input id="start_at" name="start_when" type="radio" value="start_at">
-                            <label for="start_at">Start At..</label>
-                        </div>
-                        <div class="left date_start_in_ctr" style="margin-top:15px; clear:left">
-                            <input class="thininput" id="date_start_in" name="date_start_in" value="0">
-                        </div>
-                        <div class="buttonset left date_start_in_ctr" style="margin-top:12px">
-                            <input id="date_start_unit_Days" name="date_start_unit" type="radio" value="d">
-                            <label for="date_start_unit_Days">Days</label>
-                            <input id="date_start_unit_Hours" name="date_start_unit" type="radio" value="h">
-                            <label for="date_start_unit_Hours">Hours</label>
-                            <input id="date_start_unit_Minutes" name="date_start_unit" type="radio" value="m">
-                            <label for="date_start_unit_Minutes">Minutes</label>
-                            <input id="date_start_unit_Seconds" name="date_start_unit" type="radio" value="s">
-                            <label for="date_start_unit_Seconds">Seconds</label>
-                        </div>
-                        <div class="left date_start_at_ctr" style="margin-top:12px; clear:left">
-                            <input class="thininput" id="date_start_at" name="date_start_at" value="">
-                        </div>
-                    </div>
-                    <div class="memo"></div>
-                    <input id="date_start" name="date_start" type="hidden" value="0">
-                </div>
-            </div>
-            <div class="inputzone">
-                <div>
-                    <button id="select_duration" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
-                    <span id="duration_str">Contract Duration</span>&hellip;
-                    </button>
-                </div>
-                <div class="innerzone ui-state-highlight" id="durationflds" title="Contract Duration">
-                    <div class="ui-helper-clearfix">
-                        <div class="left" style="margin-top:3px">
-                            <label for="duration">Expires in </label>
-                            <input class="thininput" id="duration" name="duration" value="900">
-                        </div>
-                        <div class="buttonset left">
-                            <input id="Days" name="duration_unit" type="radio" value="d">
-                            <label for="Days">Days</label>
-                            <input id="Hours" name="duration_unit" type="radio" value="h">
-                            <label for="Hours">Hours</label>
-                            <input id="Minutes" name="duration_unit" type="radio" value="m">
-                            <label for="Minutes">Minutes</label>
-                            <input id="Seconds" name="duration_unit" type="radio" value="s">
-                            <label for="Seconds">Seconds</label>
-                            <input id="Ticks" name="duration_unit" type="radio" value="t">
-                            <label for="Ticks">Ticks</label>
-                        </div>
-                        <div class="left" style="margin-top:12px; clear:left">
-                            OR Expires at end of
-                        </div>
-                        <div class="left" style="clear:left">
-                            <input type="text" id="duration_date"></input>
-                        </div>
-                    </div>
-                    <div class="memo"></div>
-                </div>
-            </div>
+        <div id="tokenzone">
+            <div>Binary.com API Token</div>
+            <button class="button ttip" id="clear_token" icon="ui-icon-close" mute="1" title="Forget this Token"></button>
+            <button class="button ttip" id="store_token" icon="ui-icon-check" mute="1" title="Save this Token"></button>
+            <form id="mytoken_form">
+                <input class="ui-corner-all ttip" type="password" placeholder="API Token Required" id="token" name="token"
+    title="Supply a Binary.com API User Token (as found on the Settings page).  Stay logged in to Binary.com in another browser tab.  If valid, this token will be remembered for next Start."
+                />
+            </form>
+            <div id="identity"></div>
         </div>
+
     </div>
 
     <div id="info-msg" class="ui-widget wstrade-notice ui-state-highlight ui-corner-all">
         <p><span class="left ui-icon ui-icon-info"></span><span class="notice"></span></p>
     </div>
-
     <div id="error-msg" class="ui-widget wstrade-notice ui-state-error ui-corner-all">
         <p><span class="left ui-icon ui-icon-alert"></span><span class="notice"></span></p>
+    </div>
+
+    <div class="ui-widget-content ui-corner-all ui-helper-clearfix">
+        <div class="inputzone">
+            <button id="select_symbol" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
+            <span id="display_name">Trading</span>&hellip;</button>
+            <div class="innerzone ui-state-highlight" id="symbolbuts" title="Choose Symbol">
+                Retrieving tradeable symbols..
+            </div>
+        </div>
+        <div class="inputzone">
+            <div>
+                <button id="select_contract" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
+                <span id="contract_name">Contract Type</span>&hellip;
+                </button>
+            </div>
+            <div class="innerzone ui-state-highlight" id="contractbuts" title="Contract Type">
+                <div>
+                    <div class="buttonset">
+                        <input id="CALL-euro_atm" name="ct_bc" type="radio" value="CALL-euro_atm">
+                        <label ct="CALL" for="CALL-euro_atm">Rises</label>
+                        <input id="PUT-euro_atm" name="ct_bc" type="radio" value="PUT-euro_atm">
+                        <label ct="PUT" for="PUT-euro_atm">Falls</label>
+                    </div>
+                    <div class="buttonset">
+                        <input id="CALL-euro_non_atm" name="ct_bc" type="radio" value="CALL-euro_non_atm">
+                        <label ct="CALL" for="CALL-euro_non_atm">Higher</label>
+                        <input id="PUT-euro_non_atm" name="ct_bc" type="radio" value="PUT-euro_non_atm">
+                        <label ct="PUT" for="PUT-euro_non_atm">Lower</label>
+                    </div>
+                    <br/>
+                    <div class="buttonset">
+                        <input id="EXPIRYRANGE-euro_atm" name="ct_bc" type="radio" value="EXPIRYRANGE-euro_atm">
+                        <label ct="EXPIRYRANGE" for="EXPIRYRANGE-euro_atm">Ends Outside</label>
+                        <input id="EXPIRYMISS-euro_atm" name="ct_bc" type="radio" value="EXPIRYMISS-euro_atm">
+                        <label ct="EXPIRYMISS" for="EXPIRYMISS-euro_atm">Ends Between</label>
+                    </div>
+                    <br/>
+                    <div class="buttonset">
+                        <input id="RANGE-american" name="ct_bc" type="radio" value="RANGE-american">
+                        <label ct="RANGE" for="RANGE-american">Stays Between</label>
+                        <input id="UPORDOWN-american" name="ct_bc" type="radio" value="UPORDOWN-american">
+                        <label ct="UPORDOWN" for="UPORDOWN-american">Goes Outside</label>
+                    </div>
+                    <br/>
+                    <div class="buttonset">
+                        <input id="ONETOUCH-american" name="ct_bc" type="radio" value="ONETOUCH-american">
+                        <label ct="ONETOUCH" for="ONETOUCH-american">Touches</label>
+                        <input id="NOTOUCH-american" name="ct_bc" type="radio" value="NOTOUCH-american">
+                        <label ct="NOTOUCH" for="NOTOUCH-american">Does Not Touch</label>
+                    </div>
+                    <br/>
+                    <div class="buttonset">
+                        <input id="ASIANU-asian" name="ct_bc" type="radio" value="ASIANU-asian">
+                        <label ct="ASIANU" for="ASIANU-asian">Asian Up</label>
+                        <input id="ASIAND-asian" name="ct_bc" type="radio" value="ASIAND-asian">
+                        <label ct="ASIAND" for="ASIAND-asian">Asian Down</label>
+                    </div>
+                    <br/>
+                    <div class="buttonset">
+                        <input id="DIGITMATCH-non_financial" name="ct_bc" type="radio" value="DIGITMATCH-non_financial">
+                        <label ct="DIGITMATCH" for="DIGITMATCH-non_financial">Digit Matches</label>
+                        <input id="DIGITDIFF-non_financial" name="ct_bc" type="radio" value="DIGITDIFF-non_financial">
+                        <label ct="DIGITDIFF" for="DIGITDIFF-non_financial">Digit Differs</label>
+                    </div>
+                </div>
+                <div id="barriers">
+                    <div class="cts CALL PUT ONETOUCH NOTOUCH euro_non_atm american">
+                        <label for="barrier">Target Value</label>
+                        <input class="thininput" id="barrier" name="barrier" value="0">
+                        <div id="slider1"></div>
+                    </div>
+                    <div class="cts EXPIRYRANGE EXPIRYMISS RANGE UPORDOWN euro_non_atm american">
+                        <label for="barrier2">Low Barrier </label>
+                        <input class="thininput" id="barrier2" name="barrier2" value="-5">
+                        &mdash;
+                        <input class="thininput" id="barrier" name="barrier" value="5">
+                        <label for="barrier"> High Barrier</label>
+                        <div id="slider2"></div>
+                    </div>
+                    <div class="cts DIGITMATCH DIGITDIFF non_financial">
+                        Last Digit<br/><br/>
+                        <div class="buttonset">
+                            <input id="digit0" name="barrier" type="radio" value="0">
+                            <label for="digit0">0</label>
+                            <input id="digit1" name="barrier" type="radio" value="1">
+                            <label for="digit1">1</label>
+                            <input id="digit2" name="barrier" type="radio" value="2">
+                            <label for="digit2">2</label>
+                            <input id="digit3" name="barrier" type="radio" value="3">
+                            <label for="digit3">3</label>
+                            <input id="digit4" name="barrier" type="radio" value="4">
+                            <label for="digit4">4</label>
+                            <input id="digit5" name="barrier" type="radio" value="5">
+                            <label for="digit5">5</label>
+                            <input id="digit6" name="barrier" type="radio" value="6">
+                            <label for="digit6">6</label>
+                            <input id="digit7" name="barrier" type="radio" value="7">
+                            <label for="digit7">7</label>
+                            <input id="digit8" name="barrier" type="radio" value="8">
+                            <label for="digit8">8</label>
+                            <input id="digit9" name="barrier" type="radio" value="9">
+                            <label for="digit9">9</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="memo"></div>
+                <input id="contract_type" name="contract_type" type="hidden" value="">
+                <input id="barrier_category" name="barrier_category" type="hidden" value="">
+            </div>
+        </div>
+        <div class="inputzone">
+            <div>
+                <button id="select_payout" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
+                <span id="payout_name">Contract Value</span>&hellip;
+                </button>
+            </div>
+            <div class="innerzone ui-state-highlight buttonset" id="payoutflds" title="Contract Value">
+                <div class="buttonset">
+                    <input id="Payout" name="basis" type="radio" value="payout">
+                    <label for="Payout">Payout</label>
+                    <input id="Stake" name="basis" type="radio" value="stake">
+                    <label for="Stake">Stake</label>
+                </div>
+                <br/>
+                <div class="buttonset" id="currencies">
+                    <input id="USD" name="currency" type="radio" value="USD">
+                    <label for="USD">USD</label>
+                    <input id="EUR" name="currency" type="radio" value="EUR">
+                    <label for="EUR">EUR</label>
+                    <input id="AUD" name="currency" type="radio" value="AUD">
+                    <label for="AUD">AUD</label>
+                    <input id="GBP" name="currency" type="radio" value="GBP">
+                    <label for="GBP">GBP</label>
+                    <input id="YEN" name="currency" type="radio" value="YEN">
+                    <label for="YEN">YEN</label>
+                </div>
+                <br/>
+                <div>
+                    <input id="amount_str" name="amount_str" value="10">
+                    <label for="amount_str">Value</label>
+                    <input id="amount_val" name="amount_val" type="hidden" value="10">
+                </div>
+            </div>
+        </div>
+        <div class="inputzone">
+            <div>
+                <button id="select_start" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
+                <span id="start_str">Starting..</span>&hellip;
+                </button>
+            </div>
+            <div class="innerzone ui-state-highlight" id="startflds" title="Contract Starts">
+                <div class="ui-helper-clearfix">
+                    <div class="left buttonset">
+                        <input id="start_immed" name="start_when" type="radio" value="start_immed">
+                        <label for="start_immed">Start Immediately</label>
+                        <input id="start_in" name="start_when" type="radio" value="start_in">
+                        <label for="start_in">Start In..</label>
+                        <input id="start_at" name="start_when" type="radio" value="start_at">
+                        <label for="start_at">Start At..</label>
+                    </div>
+                    <div class="left date_start_in_ctr" style="margin-top:15px; clear:left">
+                        <input class="thininput" id="date_start_in" name="date_start_in" value="0">
+                    </div>
+                    <div class="buttonset left date_start_in_ctr" style="margin-top:12px">
+                        <input id="date_start_unit_Days" name="date_start_unit" type="radio" value="d">
+                        <label for="date_start_unit_Days">Days</label>
+                        <input id="date_start_unit_Hours" name="date_start_unit" type="radio" value="h">
+                        <label for="date_start_unit_Hours">Hours</label>
+                        <input id="date_start_unit_Minutes" name="date_start_unit" type="radio" value="m">
+                        <label for="date_start_unit_Minutes">Minutes</label>
+                        <input id="date_start_unit_Seconds" name="date_start_unit" type="radio" value="s">
+                        <label for="date_start_unit_Seconds">Seconds</label>
+                    </div>
+                    <div class="left date_start_at_ctr" style="margin-top:12px; clear:left">
+                        <input class="thininput" id="date_start_at" name="date_start_at" value="">
+                    </div>
+                </div>
+                <div class="memo"></div>
+                <input id="date_start" name="date_start" type="hidden" value="0">
+            </div>
+        </div>
+        <div class="inputzone">
+            <div>
+                <button id="select_duration" type="button" class="button online" rcon="ui-icon-arrowthickstop-1-s">
+                <span id="duration_str">Contract Duration</span>&hellip;
+                </button>
+            </div>
+            <div class="innerzone ui-state-highlight" id="durationflds" title="Contract Duration">
+                <div class="ui-helper-clearfix">
+                    <div class="left" style="margin-top:3px">
+                        <label for="duration">Expires in </label>
+                        <input class="thininput" id="duration" name="duration" value="900">
+                    </div>
+                    <div class="buttonset left">
+                        <input id="Days" name="duration_unit" type="radio" value="d">
+                        <label for="Days">Days</label>
+                        <input id="Hours" name="duration_unit" type="radio" value="h">
+                        <label for="Hours">Hours</label>
+                        <input id="Minutes" name="duration_unit" type="radio" value="m">
+                        <label for="Minutes">Minutes</label>
+                        <input id="Seconds" name="duration_unit" type="radio" value="s">
+                        <label for="Seconds">Seconds</label>
+                        <input id="Ticks" name="duration_unit" type="radio" value="t">
+                        <label for="Ticks">Ticks</label>
+                    </div>
+                    <div class="left" style="margin-top:12px; clear:left">
+                        OR Expires at end of
+                    </div>
+                    <div class="left" style="clear:left">
+                        <input type="text" id="duration_date"></input>
+                    </div>
+                </div>
+                <div class="memo"></div>
+            </div>
+        </div>
     </div>
 
     <div class="ui-widget ui-widget-content ui-corner-all" id="outhalf">
@@ -474,7 +487,7 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                 //console.log('incoming message %o', data);
                 if (data.authorize) {
                     if (data.error) {
-                        alert(data.error);
+                        notice(data.error,'error');
                         return;
                     }
                     onauthorized(data);
@@ -648,7 +661,7 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                         notice('Opening connection to Binary.com');
                         opensocket();
                     } else {
-                        alert('API Token Required');
+                        notice('API Token Required','error');
                     }
                 } else if ($but.prop('paused')) {
                     $but.prop('paused', false);
@@ -665,6 +678,12 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                 }
                 if (newText) $('span.ui-button-text', $but).text(newText);
                 if (e) e.preventDefault();
+            }
+            function mytoken_submit(e) {
+                if (e) e.preventDefault();
+                if (!$('#token').val()) return;
+                $('button#clear_token').button('enable');
+                pauseit_submit();
             }
             function change_payout(e) {
                 var cur = $('input[name=currency]:checked').val();
@@ -840,14 +859,15 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
             }
 
             function onauthorized(data) {
-                var identity = data.loginid + '<br/>' + (data.fullname||'');
+                g.identity = data.loginid + ' ' + (data.fullname||'');
                 clear_notice('info');
                 clear_notice('error');
-                $('#token').hide();
-                $('#identity').html(identity);
+                $('#identity').html(g.identity);
                 var $but = $('#pauseit_form button');
                 $but.prop('started', true);
                 localStorage.setItem('token', g.token);
+                localStorage.setItem('identity', g.identity);
+                $('button#store_token').tooltip('close').button('disable');
                 $('span.ui-button-text', $but).text('Pause');
                 $('.ui-button.online').button('enable');
                 if (g.contracts_built > 0) {
@@ -865,8 +885,8 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
 
             function opensocket(opts) {
                 var handlers = {onclose:onclose,onmessage:onmessage,onopen:onopen};
-                g.ws  = new WebSocket('wss://ws.binary.com/websockets/contracts');
-                //g.ws  = new WebSocket('ws://www.devbin.io/websockets/contracts');
+                //g.ws  = new WebSocket('wss://ws.binary.com/websockets/contracts');
+                g.ws  = new WebSocket('ws://www.devbin.io/websockets/contracts');
                 $.extend(g.ws, handlers, opts);
             }
 
@@ -888,9 +908,32 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                 $div.hide();
             }
 
+            function clear_token() {
+                delete g.token;
+                localStorage.removeItem('token');
+                localStorage.removeItem('identity');
+                $('#token').val('');
+                $('button#clear_token').tooltip('close').button('disable');
+                $('button#store_token').button('enable');
+                $('#identity').html('');
+                var $but = $('#pauseit_form button');
+                $but.removeProp('started');
+                $but.removeProp('paused');
+                $('span.ui-button-text', $but).text('Start');
+                $('.ui-button.online').button('disable');
+                if (g.ws) {
+                    g.ws.onclose = function(){};
+                    g.ws.close();
+                }
+                notice('Token removed');
+            }
+
             function init() { 
 
-                // setup handlers and widgets..
+                // themeswitcher
+                $('#themeswitcher').themeswitcher({pHeight:900, isThemable:true});
+
+                // setup handlers and widgets
                 $('#select_symbol')  .click(function(){$('#symbolbuts')  .toggle('medium')}); //dialog(position('#select_symbol'))});
                 $('#select_contract').click(function(){$('#contractbuts').toggle('medium')});
                 $('#select_duration').click(function(){$('#durationflds').toggle('medium')});
@@ -935,20 +978,29 @@ title="Supply a Binary.com API User Token (as found on the Settings page).  Stay
                 $('#pricing_form').submit(pricing_submit);
                 $('#portfol_form').submit(portfol_submit);
                 $('#pauseit_form').submit(pauseit_submit);
+                $('#mytoken_form').submit(mytoken_submit);
 
                 // make all buttons
                 $('.button').each(buttonmaker);
                 // but disable online ones until online
                 $('.ui-button.online').button('disable');
 
-                // api token..
+                // nice tooltips
+                $('.ttip[title]').tooltip({show:{effect:"slideDown",delay:150}});
+
+                // api token
+                $('#clear_token').click(clear_token);
+                $('#store_token').click(mytoken_submit);
                 g.token = localStorage.getItem('token');
-                $('#token').tooltip({show:{effect:"slideDown",delay:250}});
+                g.identity = localStorage.getItem('identity');
                 if (g.token) {
                     $('#token').val(g.token);
+                    $('#identity').html(g.identity);
                     notice('Welcome.');
+                    $('button#store_token').button('disable');
                 } else {
                     notice('Welcome.  Please log into Binary.com and retrieve an API Token');
+                    $('button#clear_token').button('disable');
                 }
 
             }

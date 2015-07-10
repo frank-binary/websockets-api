@@ -13,7 +13,7 @@ function buttonmaker() {
     if (mute) opts.text = false;
     $this.button(opts);
     if (size && size=='baby') $this.css({'font-size':'0.75em'});
-    if (size && size=='huge') $this.css({'font-size':'1.75em'});
+    if (size && size=='huge') $this.css({'font-size':'1.50em'});
 }
 
 /************************

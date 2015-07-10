@@ -1,18 +1,25 @@
 
 body                { font: 62.5% "Trebuchet MS", sans-serif } /* sets 1em == 10px */
 
-div#header a img    { height: 120px }
 .left               { float: left }
-.right              { float: right }
+.right              { float: right; text-align: right }
+
+div#header          { position: relative }
+div#header a img    { height: 120px }
+#themeswitcher      { position: absolute; right:8px; top:0 }
+#tokenzone          { position: absolute; right:8px; top:50%; text-align:right }
+
+form                { display: inline-block }
+
+div#identity        { margin: 4px 0 0 0 }
+
 div#inhead          { margin: 0px 10px 0px 20px }
-div#identity        { display: inline-block }
 div.wstrade-notice          { padding: 0.2em 0.8em; display: none }
 div.wstrade-notice .ui-icon { margin-right: 0.3em }
 div.wstrade-notice p        { margin: .3em 0 }
 .local-content      { padding: 8px }
-#themeswitcher-ctr  { width: 188px }
 
-span.bigtext { font-size: 1.75em }
+span.bigtext { font-size: 1.50em }
 div.inputzone { margin: 12px }
 div.butonzone { margin: 12px; display: inline-block }
 div.innerzone { padding: 12px }
@@ -36,6 +43,7 @@ div.contract div        { margin: 2px 0 0 0 }
 div.contract div.elbow  { display: inline-block; width: 60px; text-align: right; margin-right: 12px }
 
 input.thininput         { width: 60px }
+input#token             { width: 180px }
 div#rangeslider         { width: 200px }
 #slider1, #slider2      { margin-top: 12px }
 
