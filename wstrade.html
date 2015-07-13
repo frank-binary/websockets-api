@@ -317,8 +317,8 @@
             var buysell = this.bSell? 'SELL': 'BUY';
             var div = '<div id="' + data.id + '" class="contract ui-state-default">'
                          + '<div class="contract_header ui-helper-clearfix">'
-                             + '<button class="forget right" size="baby" mute="1" icon="ui-icon-circle-close">Close</button>'
-                             + '<button class="dtldlg right" size="baby" mute="1" icon="ui-icon-help">Details</button>'
+                             + '<button class="forget right ttip" size="baby" mute="1" icon="ui-icon-circle-close" title="Close">&nbsp;</button>'
+                             + '<button class="dtldlg right ttip" size="baby" mute="1" icon="ui-icon-help" title="Details">&nbsp;</button>'
                              + '<div class="proposal">Offer</div>'
                              + '<span class="error"></span>'
                              + '<button class="purchase" size="huge" icon="ui-icon-cart">' + buysell + '</button>'
@@ -335,6 +335,7 @@
             this.$div = $('#'+data.id, g.$contracts);
             this.$dlg = $('div.contract_dlg', this.$div).dialog({autoOpen:false});
             $('button', this.$div).each(buttonmaker);
+            $('.ttip[title]', this.$div).tooltip({show:{effect:"slideDown",delay:150}});
             $('button.forget', this.$div).click(forget);
             $('button.dtldlg', this.$div).click(dtldlg);
             $('button.purchase', this.$div).click(purchase);
@@ -883,8 +884,8 @@
 
             function opensocket(opts) {
                 var handlers = {onclose:onclose,onmessage:onmessage,onopen:onopen};
-                g.ws  = new WebSocket('wss://ws.binary.com/websockets/contracts');
-                //g.ws  = new WebSocket('ws://www.devbin.io/websockets/contracts');
+                //g.ws  = new WebSocket('wss://ws.binary.com/websockets/contracts');
+                g.ws  = new WebSocket('ws://www.devbin.io/websockets/contracts');
                 $.extend(g.ws, handlers, opts);
             }
 
