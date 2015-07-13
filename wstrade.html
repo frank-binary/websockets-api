@@ -483,7 +483,8 @@
             }
             function onmessage(m) {
                 var data = JSON.parse(m.data);
-                //console.log('incoming message %o', data);
+                if (g.options.debug) console.log('incoming message %o', data);
+
                 if (data.authorize) {
                     if (data.error) {
                         notice(data.error,'error');
@@ -931,6 +932,9 @@
             }
 
             function init() { 
+
+                // get url search-string options
+                g.options = urlOpts();
 
                 // themeswitcher
                 $('#themeswitcher').themeswitcher({pHeight:700, isThemable:true});

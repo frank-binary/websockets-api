@@ -1,6 +1,9 @@
 
 // utility.js
 
+/************************
+add some size and icon declarations to standard jquery-ui buttons
+************************/
 function buttonmaker() {
     var $this = $(this);
     var icon = $this.attr('icon');
@@ -51,8 +54,24 @@ String.prototype.initCap = function(){
     return this.replace(/(?:^|\s)[a-z]/g,function(m){return m.toUpperCase()})
 }
 
-// We need to upgrade to Globalize 1.0.  Till then:
-// http://freeda.dbnet.com.au/pub/globalize/0.1.1/examples/browser/
+/************************
+get url search-string options
+************************/
+function urlOpts() {
+    var hash = {};
+    var parts = window.location.search.slice(1).split('&');
+    $.each(parts, function(i,part) {
+        var pair = part.split('=').map(decodeURIComponent);
+        hash[pair[0]] = pair[1]
+    });
+    return hash;
+}
+
+/***************************
+Globalize helpers
+   We need to upgrade from Globalize 0.9 to Globalize 1.0.  Till then:
+   http://freeda.dbnet.com.au/pub/globalize/0.1.1/examples/browser/
+************************/
 function niceDayUTC(epochStr) {
     var epoch = parseInt(epochStr) + g.timezone_offset;
     return Globalize.format(new Date(epoch*1000), "dd-MMM-yyyy", 'en-GB');
