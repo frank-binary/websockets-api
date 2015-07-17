@@ -465,7 +465,7 @@
                 ui.tooltip.data('symbol', symbol);
                 g.$live_symbols[symbol] = ui.tooltip;
                 g.ws.send(JSON.stringify({ticks:symbol}));
-                g.ws.send(JSON.stringify({ticks:symbol, end:'latest'}));
+                g.ws.send(JSON.stringify({ticks:symbol, count:50, end:'latest'}));
             }
             function spot_report(s) {
                 var d = new Date(s.spot_time*1000);
