@@ -319,7 +319,7 @@
                          + '<div class="contract_header ui-helper-clearfix">'
                              + '<button class="forget right ttip" size="baby" mute="1" icon="ui-icon-circle-close" title="Close">&nbsp;</button>'
                              + '<button class="dtldlg right ttip" size="baby" mute="1" icon="ui-icon-help" title="Details">&nbsp;</button>'
-                             + '<div class="proposal">Offer</div>'
+                             + '<div class="premise">Offer</div>'
                              + '<span class="error"></span>'
                              + '<button class="purchase" size="huge" icon="ui-icon-cart">' + buysell + '</button>'
                          + '</div>'
@@ -341,7 +341,7 @@
             $('button.purchase', this.$div).click(purchase);
             if (this.bSell) {
                 this.$div.removeClass('ui-state-active').addClass('ui-state-highlight');
-                $('.proposal', this.$div).html('Contract ' + data.fmb_id);
+                $('.premise', this.$div).html('Contract ' + data.fmb_id);
             }
         };
         g.Contract.prototype.update = function(data) {
@@ -382,7 +382,7 @@
                 this.bSell = true;
                 $('button.purchase', this.$div).button('option', 'label', data.fmb_id);
                 this.$div.removeClass('ui-state-active').addClass('ui-state-highlight');
-                $('.proposal', this.$div).html('Contract ' + data.fmb_id);
+                $('.premise', this.$div).html('Contract ' + data.fmb_id);
             }
             var details = '';
             if (this.bSell) {
@@ -457,7 +457,6 @@
                 delete g.$live_symbols[symbol];
                 var symbol_id = ui.tooltip.data('symbol_id');
                 if (symbol_id) {
-                    delete g.$live_symbols[symbol_id];
                     g.ws.send(JSON.stringify({forget:symbol_id}));
                 }
             }
@@ -466,6 +465,7 @@
                 ui.tooltip.data('symbol', symbol);
                 g.$live_symbols[symbol] = ui.tooltip;
                 g.ws.send(JSON.stringify({ticks:symbol}));
+                g.ws.send(JSON.stringify({ticks:symbol, end:'latest'}));
             }
             function spot_report(s) {
                 var d = new Date(s.spot_time*1000);
@@ -500,8 +500,12 @@
                         if (data.id) g.ws.send(JSON.stringify({forget:data.id}));
                         return;
                     }
-                    if (data.id && !g.$live_symbols[data.id]) g.$live_symbols[data.id] = $live_symbol; 
                     var s = g.all_symbols[symbol];
+                    if (data.history) {
+                        s.history = data.history;
+                        console.log("sym info is now %o", s);
+                        return;
+                    }
                     if (data.error) {
                         s.error = data.error
                     } else {
@@ -639,7 +643,7 @@
                 g.ws.send(JSON.stringify({buy:contract_id, price:price}));
             }
             function pricing_submit(e) {
-                var data = {};
+                var data = {proposal:1};
                 var arr = $('input, select', $('.innerzone')).serializeArray();
                 $.each(arr,function(idx,val){data[val.name]=val.value});
                 console.log("submitting data %o", data);
