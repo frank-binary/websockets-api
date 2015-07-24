@@ -893,7 +893,7 @@
 
             function opensocket(opts) {
                 var handlers = {onclose:onclose,onmessage:onmessage,onopen:onopen};
-                var url = true || window.location.host == 'wstrade.binary.com'
+                var url = window.location.host == 'wstrade.binary.com'
                             ? 'wss://ws.binary.com/websockets/contracts'
                             : 'ws://www.devbin.io/websockets/contracts';
                 g.ws  = new WebSocket(url);
