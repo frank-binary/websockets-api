@@ -521,7 +521,7 @@
                     return;
                 }
                 if (data.active_symbols) {
-                    g.all_symbols = data.active_symbols;
+                    g.all_symbols = data.symbols;
                     g.ws.send(JSON.stringify({offerings:{}}));
                     return;
                 }
@@ -560,10 +560,10 @@
                     return;
                 }
                 if (data.contracts_for) {
-                    var symbol = data.contracts_for.symbol;
+                    var symbol = data.contracts_for;
                     delete data.contracts_for.symbol;
-                    console.log("limits_for " + symbol + ": %o", data.contracts_for);
-                    g.limits_for[symbol] = data.contracts_for;
+                    console.log("limits_for " + symbol + ": %o", data.contracts);
+                    g.limits_for[symbol] = data.contracts;
                     apply_limits();
                     return;
                 }
