@@ -495,6 +495,13 @@
                     onauthorized(data);
                     return;
                 }
+
+                if (data.history) {
+                    var symbol = data.echo_req.ticks;
+                    g.all_symbols[symbol].history = data.history;
+                    return;
+                }
+
                 if (data.ticks) {
                     var symbol = data.ticks;
                     var $live_symbol = g.$live_symbols[symbol];
@@ -503,8 +510,7 @@
                         return;
                     }
                     var s = g.all_symbols[symbol];
-                    if      (data.history) s.history = data.history;
-                    else if (data.error  ) s.error = data.error;
+                    if      (data.error  ) s.error = data.error;
                     else if (data.quote  ) {
                         delete s.error;
                         s.spot = data.quote;
@@ -520,7 +526,8 @@
                     if (s.history) $('.spark', $live_symbol).sparkline(s.history.prices, {height:'3em'});
                     return;
                 }
-                if (data.active_symbols) {
+
+                if (data.symbols) {
                     g.all_symbols = data.symbols;
                     g.ws.send(JSON.stringify({offerings:{}}));
                     return;
@@ -559,7 +566,8 @@
                     if (g.portfolio_stats.batch_count==0) $('#portfol_form button').button('enable');
                     return;
                 }
-                if (data.contracts_for) {
+                if (data.contracts) {
+                    data = $.extend({}, data.echo_req, data.contracts);
                     var symbol = data.contracts_for;
                     delete data.contracts_for.symbol;
                     console.log("limits_for " + symbol + ": %o", data.contracts);
@@ -567,33 +575,38 @@
                     apply_limits();
                     return;
                 }
-                // any other input message should be about a contract.
-                var contract_id = data.id;
-                var contract = g.live_contracts[contract_id];
-                if (!contract) {
-                    if (data.fmb_id) {
-                        if (data.batch_index == data.batch_count) {
-                            $('#portfol_form button').button('enable');
+                if (data.proposal) {
+                    data = $.extend({}, data.echo_req, data.proposal);
+                    var contract_id = data.id;
+                    var contract = g.live_contracts[contract_id];
+                    if (!contract) {
+                        if (data.fmb_id) {
+                            if (data.batch_index == data.batch_count) {
+                                $('#portfol_form button').button('enable');
+                            }
+                            if (g.fmb_ids[data.fmb_id]) {
+                                console.log("already showing fmb_id " + data.fmb_id +"; forget " + data.id);
+                                g.ws.send(JSON.stringify({forget:data.id}));
+                                return
+                            }
                         }
-                        if (g.fmb_ids[data.fmb_id]) {
-                            console.log("already showing fmb_id " + data.fmb_id +"; forget " + data.id);
-                            g.ws.send(JSON.stringify({forget:data.id}));
+                        contract = new g.Contract(data);
+                        if (!contract.d0) { // means not built successfully
+                            console.log("did not build; forget " + contract_id);
+                            g.ws.send(JSON.stringify({forget:contract_id}));
+                            contract.destroy();
                             return
                         }
+                        g.live_contracts[contract_id] = contract;
+                        g.contracts_built++;
+                        if (data.fmb_id) g.fmb_ids[data.fmb_id] = contract;
+                        clear_notice('info');
                     }
-                    contract = new g.Contract(data);
-                    if (!contract.d0) { // means not built successfully
-                        console.log("did not build; forget " + contract_id);
-                        g.ws.send(JSON.stringify({forget:contract_id}));
-                        contract.destroy();
-                        return
-                    }
-                    g.live_contracts[contract_id] = contract;
-                    g.contracts_built++;
-                    if (data.fmb_id) g.fmb_ids[data.fmb_id] = contract;
-                    clear_notice('info');
+                    contract.update(data);
+                    return;
                 }
-                contract.update(data);
+                // any other input message unrecognised
+                console.log("unknown message %o", data);
             }
             function apply_limits() {
                 var sym = $('#symbolbuts input[name=symbol]:checked').attr('id');
