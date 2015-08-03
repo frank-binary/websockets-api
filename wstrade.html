@@ -440,7 +440,7 @@
                 //console.log("buttonset now %o", buttonset);
                 $('#symbolbuts').html(buttonsets).accordion({collapsible:true, heightStyle:'content'});
                 $('#symbolbuts .buttonset').buttonset();
-                $('#symbolbuts label').tooltip({items:"label", open: opensym, close: closesym, content: showsym});
+                $('#symbolbuts label').stickytip({items:"label", open: opensym, close: closesym, content: showsym});
                 $('#symbolbuts input[name=symbol]').change(change_symbol);
                 // initial trading values..
                 $('#symbolbuts input#' + g.init_trade.symbol).prop('checked',true).button('refresh').change();
@@ -1035,6 +1035,7 @@
 
             }
             $(init);
+
 
     </script>
 

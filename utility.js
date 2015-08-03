@@ -34,6 +34,22 @@ $.widget( "ui.timespinner", $.ui.spinner, {
 });
 
 /************************
+prepare a 'stickytip' widget extension to 'tooltip'
+to close on click instead of on mouseout
+************************/
+var tto = $.ui.tooltip.prototype.open;
+var ttc = $.ui.tooltip.prototype.close;
+$.widget( "ui.stickytip", $.ui.tooltip, {
+    open : function(ev) {
+                tto.call(this,ev);
+                var $target = this._find(this.element);
+                var that = this;
+                $target.click(function(ev){ttc.call(that)});
+            },
+    close: function(ev){}
+});
+
+/************************
 a rounding function that works the same for strings and nums
 ************************/
 Number.prototype.round = function(places) { return +(this.toFixed(places)) }
