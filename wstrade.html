@@ -497,12 +497,16 @@
                 }
 
                 if (data.history) {
-                    var symbol = data.echo_req.ticks;
-                    g.all_symbols[symbol].history = data.history;
+                    data = $.extend({}, data.echo_req, data.history);
+                    console.log("got tick history %o", data);
+                    var symbol = data.ticks;
+                    g.all_symbols[symbol].history = data;
                     return;
                 }
 
-                if (data.ticks) {
+                if (data.tick) {
+                    data = $.extend({}, data.echo_req, data.tick);
+                    console.log("got tick quote %o", data);
                     var symbol = data.ticks;
                     var $live_symbol = g.$live_symbols[symbol];
                     if (!$live_symbol) {
@@ -569,9 +573,8 @@
                 if (data.contracts) {
                     data = $.extend({}, data.echo_req, data.contracts);
                     var symbol = data.contracts_for;
-                    delete data.contracts_for.symbol;
-                    console.log("limits_for " + symbol + ": %o", data.contracts);
-                    g.limits_for[symbol] = data.contracts;
+                    delete data.contracts_for;
+                    g.limits_for[symbol] = data;
                     apply_limits();
                     return;
                 }
