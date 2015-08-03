@@ -488,6 +488,7 @@
                 if (g.options.debug) console.log('incoming message %o', data);
 
                 if (data.authorize) {
+                    data = $.extend({}, data.echo_req, data.authorize);
                     if (data.error) {
                         notice(data.error,'error');
                         return;
@@ -904,6 +905,7 @@
                     return;
                 }
                 notice("Getting latest market conditions from Binary.com");
+                g.ws.send(JSON.stringify({payout_currencies:1}));
                 g.ws.send(JSON.stringify({active_symbols:'display_name'}));
             }
 
