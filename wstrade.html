@@ -440,7 +440,7 @@
                 //console.log("buttonset now %o", buttonset);
                 $('#symbolbuts').html(buttonsets).accordion({collapsible:true, heightStyle:'content'});
                 $('#symbolbuts .buttonset').buttonset();
-                $('#symbolbuts label').stickytip({items:"label", open: opensym, close: closesym, content: showsym});
+                $('#symbolbuts label').stickytip({items:"label", tooltipClass: "ui-livesym-ttip", open: opensym, close: closesym, content: showsym});
                 $('#symbolbuts input[name=symbol]').change(change_symbol);
                 // initial trading values..
                 $('#symbolbuts input#' + g.init_trade.symbol).prop('checked',true).button('refresh').change();
@@ -465,13 +465,16 @@
                 var symbol = $('h2.livesym', ui.tooltip).attr('symbol');
                 ui.tooltip.data('symbol', symbol);
                 g.$live_symbols[symbol] = ui.tooltip;
+                g.ws.send(JSON.stringify({ticks:symbol, count:65, end:'latest'}));
                 g.ws.send(JSON.stringify({ticks:symbol}));
-                g.ws.send(JSON.stringify({ticks:symbol, count:50, end:'latest'}));
+                ui.tooltip.draggable();
             }
             function spot_report(s) {
                 var d = new Date(s.spot_time*1000);
-                var str = '<h2 class="livesym" symbol="' + s.symbol + '">'
-                        + s.display_name + ": " + s.quoted_currency_symbol + " " + s.spot + "</h2>"
+                var str = ''
+                        + '<span class="babybox right">X</span>'
+                        + '<h2 class="livesym left" symbol="' + s.symbol + '">'
+                        + s.display_name + "<br/>" + s.quoted_currency_symbol + " " + s.spot + "</h2>"
                         + '<span class="spark"></span>'
                         + "<div>" + s.exchange_name + " &mdash; " + s.symbol + "</div>"
                         + "<div> as at " + d.toUTCString() + "</div>";
@@ -507,11 +510,13 @@
 
                 if (data.history) {
                     var symbol = data.ticks;
-                    g.all_symbols[symbol].history = data;
+                    g.all_symbols[symbol].history = data.history;
                     return;
                 }
 
                 if (data.tick) {
+                    $.extend(data, data.tick);
+                    delete data.tick;
                     var symbol = data.ticks;
                     var $live_symbol = g.$live_symbols[symbol];
                     if (!$live_symbol) {
