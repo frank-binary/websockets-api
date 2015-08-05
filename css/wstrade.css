@@ -48,5 +48,6 @@ div#rangeslider         { width: 200px }
 #slider1, #slider2      { margin-top: 12px }
 
 h2.livesym              { margin-top: 1px }
-.ui-livesym-ttip        { max-width: 220px }
-.babybox                { border: 1px outset; padding: 2px }
+.ui-livesym-ttip        { max-width: 220px; cursor: move }
+.ui-livesym-ttip .spark { cursor: none }
+.babybox                { border: 1px outset; padding: 2px 3px; cursor: pointer }

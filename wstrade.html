@@ -60,6 +60,7 @@
                 />
             </form>
             <div id="identity"></div>
+            <div><span id="currency"></span>&nbsp;<span id="balance"></span></div>
         </div>
 
     </div>
@@ -504,7 +505,7 @@
                         notice(data.error,'error');
                         return;
                     }
-                    onauthorized(data);
+                    onauthorized(data.authorize);
                     return;
                 }
 
@@ -550,24 +551,18 @@
                     build_symbols(data.offerings);
                     return;
                 }
-                if (data.buy) {
-                    var contract = g.live_contracts[data.buy];
+                if (data.receipt) {
+                    $.extend(data, data.receipt);
+                    var id = data.buy || data.sell;
+                    var contract = g.live_contracts[id];
                     if (!contract) {
-                        g.ws.send(JSON.stringify({forget:data.buy}));
+                        g.ws.send(JSON.stringify({forget:id}));
                         return;
                     }
-                    g.fmb_ids[data.fmb_id] = contract;
+                    if (data.buy) g.fmb_ids[data.fmb_id] = contract;
                     contract.update(data);
-                    return
-                }
-                if (data.sell) {
-                    var contract = g.live_contracts[data.sell];
-                    if (!contract) {
-                        g.ws.send(JSON.stringify({forget:data.sell}));
-                        return;
-                    }
-                    contract.update(data);
-                    return
+                    $('#balance').html(data.balance_after);
+                    return;
                 }
                 if (data.portfolio_stats) {
                     g.portfolio_stats = data.portfolio_stats;
@@ -588,14 +583,31 @@
                     var contract_id = data.id;
                     var contract = g.live_contracts[contract_id];
                     if (!contract) {
-                        if (data.fmb_id) {
-                            if (data.batch_index == data.batch_count) {
-                                $('#portfol_form button').button('enable');
-                            }
-                            if (g.fmb_ids[data.fmb_id]) {
-                                g.ws.send(JSON.stringify({forget:data.id}));
-                                return
-                            }
+                        contract = new g.Contract(data);
+                        if (!contract.d0) { // means not built successfully
+                            g.ws.send(JSON.stringify({forget:contract_id}));
+                            contract.destroy();
+                            return
+                        }
+                        g.live_contracts[contract_id] = contract;
+                        g.contracts_built++;
+                        if (data.fmb_id) g.fmb_ids[data.fmb_id] = contract;
+                        clear_notice('info');
+                    }
+                    contract.update(data);
+                    return;
+                }
+                if (data.portfolio) {
+                    data = data.portfolio;
+                    var contract_id = data.id;
+                    var contract = g.live_contracts[contract_id];
+                    if (!contract) {
+                        if (data.batch_index == data.batch_count) {
+                            $('#portfol_form button').button('enable');
+                        }
+                        if (g.fmb_ids[data.fmb_id]) {
+                            g.ws.send(JSON.stringify({forget:data.id}));
+                            return
                         }
                         contract = new g.Contract(data);
                         if (!contract.d0) { // means not built successfully
@@ -611,6 +623,7 @@
                     contract.update(data);
                     return;
                 }
+
                 // any other input message unrecognised
                 if (g.options.debug) console.log("unknown message %o", data);
             }
@@ -887,9 +900,14 @@
 
             function onauthorized(data) {
                 g.identity = data.loginid + ' ' + (data.fullname||'');
+                g.currency = data.currency;
+                g.balance = data.balance;
+                console.log("g is now %o", g);
                 clear_notice('info');
                 clear_notice('error');
                 $('#identity').html(g.identity);
+                $('#currency').html(g.currency);
+                $('#balance').html(g.balance);
                 var $but = $('#pauseit_form button');
                 $but.prop('started', true);
                 localStorage.setItem('token', g.token);
@@ -907,7 +925,6 @@
                     return;
                 }
                 notice("Getting latest market conditions from Binary.com");
-                g.ws.send(JSON.stringify({payout_currencies:1}));
                 g.ws.send(JSON.stringify({active_symbols:'display_name'}));
             }
 
