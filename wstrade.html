@@ -305,10 +305,10 @@
         g.contracts_built = 0;
         g.timezone_offset = (new Date()).getTimezoneOffset()*60;
         g.Contract = function(data) {
-            console.log("new contract data %o", data);
+            //console.log("new contract data %o", data);
             var symobj = g.all_symbols[data.symbol];
             if (!symobj) {
-                console.log("will not build, no symbol " + data.symbol);
+                //console.log("will not build, no symbol " + data.symbol);
                 return
             }
             var ct_bc = data.contract_type;
@@ -484,11 +484,19 @@
                 return spot_report(g.all_symbols[symbol]);
             }
             function onmessage(m) {
-                var data = JSON.parse(m.data);
-                if (g.options.debug) console.log('incoming message %o', data);
+                var message = JSON.parse(m.data);
+                if (g.options.debug) {
+                    var image = $.extend(true, {}, message);
+                    console.log('msg incoming  %o', image);
+                }
+
+                // merge request and response values, and throw away msg_type (redundant)
+                var data = message.echo_req;
+                delete message.echo_req;
+                delete message.msg_type;
+                $.extend(data, message);
 
                 if (data.authorize) {
-                    data = $.extend({}, data.echo_req, data.authorize);
                     if (data.error) {
                         notice(data.error,'error');
                         return;
@@ -498,16 +506,12 @@
                 }
 
                 if (data.history) {
-                    data = $.extend({}, data.echo_req, data.history);
-                    console.log("got tick history %o", data);
                     var symbol = data.ticks;
                     g.all_symbols[symbol].history = data;
                     return;
                 }
 
                 if (data.tick) {
-                    data = $.extend({}, data.echo_req, data.tick);
-                    console.log("got tick quote %o", data);
                     var symbol = data.ticks;
                     var $live_symbol = g.$live_symbols[symbol];
                     if (!$live_symbol) {
@@ -538,15 +542,12 @@
                     return;
                 }
                 if (data.offerings) {
-                    console.log("offerings data is %o", data);
                     build_symbols(data.offerings);
                     return;
                 }
                 if (data.buy) {
-                    console.log("buy result data is %o", data);
                     var contract = g.live_contracts[data.buy];
                     if (!contract) {
-                        console.log("dropping buy result for " + data.buy);
                         g.ws.send(JSON.stringify({forget:data.buy}));
                         return;
                     }
@@ -555,10 +556,8 @@
                     return
                 }
                 if (data.sell) {
-                    console.log("sell result data is %o", data);
                     var contract = g.live_contracts[data.sell];
                     if (!contract) {
-                        console.log("dropping sell result for " + data.sell);
                         g.ws.send(JSON.stringify({forget:data.sell}));
                         return;
                     }
@@ -567,20 +566,20 @@
                 }
                 if (data.portfolio_stats) {
                     g.portfolio_stats = data.portfolio_stats;
-                    console.log("portfolio stats: %o", g.portfolio_stats);
                     if (g.portfolio_stats.batch_count==0) $('#portfol_form button').button('enable');
                     return;
                 }
                 if (data.contracts) {
-                    data = $.extend({}, data.echo_req, data.contracts);
                     var symbol = data.contracts_for;
+                    console.log("contracts.  deal with %o for " + symbol, data);
                     delete data.contracts_for;
-                    g.limits_for[symbol] = data;
+                    g.limits_for[symbol] = data.contracts;
                     apply_limits();
                     return;
                 }
                 if (data.proposal) {
-                    data = $.extend({}, data.echo_req, data.proposal);
+                    $.extend(data, data.proposal);
+                    delete data.proposal;
                     var contract_id = data.id;
                     var contract = g.live_contracts[contract_id];
                     if (!contract) {
@@ -589,14 +588,12 @@
                                 $('#portfol_form button').button('enable');
                             }
                             if (g.fmb_ids[data.fmb_id]) {
-                                console.log("already showing fmb_id " + data.fmb_id +"; forget " + data.id);
                                 g.ws.send(JSON.stringify({forget:data.id}));
                                 return
                             }
                         }
                         contract = new g.Contract(data);
                         if (!contract.d0) { // means not built successfully
-                            console.log("did not build; forget " + contract_id);
                             g.ws.send(JSON.stringify({forget:contract_id}));
                             contract.destroy();
                             return
@@ -610,14 +607,14 @@
                     return;
                 }
                 // any other input message unrecognised
-                console.log("unknown message %o", data);
+                if (g.options.debug) console.log("unknown message %o", data);
             }
             function apply_limits() {
                 var sym = $('#symbolbuts input[name=symbol]:checked').attr('id');
                 if (!sym) return;
                 var limits = g.limits_for[sym];
                 if (!limits) return;
-                console.log("apply limits for " + sym + " using %o", limits);
+                //console.log("apply limits for " + sym + " using %o", limits);
                 $('#contractbuts input[name=ct_bc]').button('disable').removeData('limits');
                 $.each(limits.available, function(i,limit){
                     var ct_bc = limit.contract_type + '-' + limit.barrier_category;
@@ -631,7 +628,7 @@
                     $('#contractbuts input[name=ct_bc]:enabled').first().prop('checked',true).button('refresh');
                 }
                 var $but = $('#contractbuts input[name=ct_bc]:checked');
-                console.log("with data %o", $but.data('limits'));
+                //console.log("with data %o", $but.data('limits'));
                 $but.change();
             }
             function forget() {
@@ -646,7 +643,7 @@
             function dtldlg() {
                 var contract_id = $(this).parents('.contract').attr('id');
                 var contract = g.live_contracts[contract_id];
-                console.log("detail for %o!", contract);
+                //console.log("detail for %o!", contract);
                 contract.$dlg.dialog('open');
             }
             function purchase() {
@@ -655,19 +652,19 @@
                 $(this).button('disable').button('option', 'label', 'Wait..');
                 if (contract.bSell) {
                     var price = contract.d0.bid_price;
-                    console.log("selling " + contract_id + " from %o " + " for " + price, contract);
+                    //console.log("selling " + contract_id + " from %o " + " for " + price, contract);
                     g.ws.send(JSON.stringify({sell:contract_id, price:price}));
                     return;
                 }
                 var price = contract.d0.ask_price;
-                console.log("buying " + contract_id + " from %o " + " for " + price, contract);
+                //console.log("buying " + contract_id + " from %o " + " for " + price, contract);
                 g.ws.send(JSON.stringify({buy:contract_id, price:price}));
             }
             function pricing_submit(e) {
                 var data = {proposal:1};
                 var arr = $('input, select', $('.innerzone')).serializeArray();
                 $.each(arr,function(idx,val){data[val.name]=val.value});
-                console.log("submitting data %o", data);
+                //console.log("submitting data %o", data);
                 g.ws.send(JSON.stringify(data));
                 if (e) e.preventDefault();
             }
@@ -743,7 +740,7 @@
                 $('#barriers .cts.'+ct+'.'+bc).show().find('input').prop('disabled', false);
                 var limits = $ct_bc.data('limits');
                 if (!limits) return;
-                console.log("chosen ct " + ct + " bc " + bc + ' with limits %o', limits);
+                //console.log("chosen ct " + ct + " bc " + bc + ' with limits %o', limits);
                 // disable all start options and enable relevant ones..
                 $('#startflds input[name=start_when]').button('disable');
                 var fs_memo = '';
@@ -866,7 +863,7 @@
             }
 
             function onclose(ev) {
-                console.log("websocket closed with event %o.", ev);
+                //console.log("websocket closed with event %o.", ev);
                 if ($('#pauseit_form button').prop('started')) {
                     if (g.degrade) g.degrade *= 1.2; else g.degrade = 1;
                     notice("Connection lost.  Re-trying in " + g.degrade.round(1) + ' secs', 'error');
