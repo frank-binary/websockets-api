@@ -559,8 +559,8 @@
                     build_symbols(data.offerings);
                     return;
                 }
-                if (data.receipt) {
-                    $.extend(data, data.receipt);
+                if (data.buy || data.sell) {
+                    if (data.receipt) $.extend(data, data.receipt);
                     var id = data.buy || data.sell;
                     var contract = g.live_contracts[id];
                     if (!contract) {
