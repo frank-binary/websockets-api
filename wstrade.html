@@ -466,6 +466,7 @@
                 var symbol = $('h2.livesym', ui.tooltip).attr('symbol');
                 ui.tooltip.data('symbol', symbol);
                 g.$live_symbols[symbol] = ui.tooltip;
+                //g.ws.send(JSON.stringify({ticks:symbol, count:65, end:'latest', style: 'candles'}));
                 g.ws.send(JSON.stringify({ticks:symbol, count:65, end:'latest'}));
                 g.ws.send(JSON.stringify({ticks:symbol}));
                 ui.tooltip.draggable();
@@ -515,6 +516,13 @@
                     return;
                 }
 
+                if (data.candles) {
+                    var symbol = data.ticks;
+                    console.log("received candles data %o", data);
+                    g.all_symbols[symbol].candles = data.candles;
+                    return;
+                }
+
                 if (data.tick) {
                     $.extend(data, data.tick);
                     delete data.tick;
@@ -551,8 +559,8 @@
                     build_symbols(data.offerings);
                     return;
                 }
-                if (data.receipt) {
-                    $.extend(data, data.receipt);
+                if (data.buy || data.sell) {
+                    if (data.receipt) $.extend(data, data.receipt);
                     var id = data.buy || data.sell;
                     var contract = g.live_contracts[id];
                     if (!contract) {
