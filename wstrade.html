@@ -42,6 +42,13 @@
                     <button class="button online" icon="ui-icon-suitcase" size="huge">Portfolio</button>
                 </div>
             </form>
+            <!-- soon..
+            <form id="statmnt_form">
+                <div class="butonzone buttonset">
+                    <button class="button online" icon="ui-icon-script" size="huge">Statement</button>
+                </div>
+            </form>
+            -->
             <form id="pauseit_form">
                 <div class="butonzone buttonset">
                     <button class="button" icon="ui-icon-cancel" size="huge">Start</button>
@@ -467,7 +474,6 @@
                 ui.tooltip.data('symbol', symbol);
                 g.$live_symbols[symbol] = ui.tooltip;
                 //g.ws.send(JSON.stringify({ticks:symbol, count:65, end:'latest', style: 'candles'}));
-                g.ws.send(JSON.stringify({statement: {description:1}}));
                 g.ws.send(JSON.stringify({ticks:symbol, count:65, end:'latest'}));
                 g.ws.send(JSON.stringify({ticks:symbol}));
                 ui.tooltip.draggable();
@@ -496,14 +502,13 @@
                     console.log('msg incoming  %o', image);
                 }
 
-                // merge request and response values, and throw away msg_type (redundant)
-
                 // special cases: overloaded names in received stream
                 if (message.contracts_for) {
                     message.contracts_for_symbol = message.echo_req.contracts_for;
                     delete message.echo_req.contracts_for;
                 }
 
+                // merge request and response values, and throw away msg_type (redundant)
                 var data = message.echo_req;
                 delete message.echo_req;
                 delete message.msg_type;
@@ -526,8 +531,12 @@
 
                 if (data.candles) {
                     var symbol = data.ticks;
-                    console.log("received candles data %o", data);
                     g.all_symbols[symbol].candles = data.candles;
+                    return;
+                }
+
+                if (data.statement) {
+                    console.log('statement info received %o', data);
                     return;
                 }
 
@@ -568,7 +577,8 @@
                     return;
                 }
                 if (data.buy || data.sell) {
-                    if (data.receipt) $.extend(data, data.receipt);
+                    if (data.open_receipt) $.extend(data, data.open_receipt);
+                    if (data.close_receipt) $.extend(data, data.close_receipt);
                     var id = data.buy || data.sell;
                     var contract = g.live_contracts[id];
                     if (!contract) {
@@ -577,7 +587,8 @@
                     }
                     if (data.buy) g.fmb_ids[data.fmb_id] = contract;
                     contract.update(data);
-                    $('#balance').html(data.balance_after);
+                    g.account.balance = data.balance_after;
+                    $('#balance').html(g.account.balance);
                     return;
                 }
                 if (data.portfolio_stats) {
@@ -706,6 +717,11 @@
                 $('#portfol_form button').button('disable');
                 g.ws.send(JSON.stringify({portfolio:1}));
                 $('.innerzone.ui-dialog-content').dialog('close');
+                if (e) e.preventDefault();
+            }
+            function statmnt_submit(e) {
+                $('#statmnt_form button').button('disable');
+                g.ws.send(JSON.stringify({statement:{}}));
                 if (e) e.preventDefault();
             }
             function pauseit_submit(e) {
@@ -915,15 +931,14 @@
             }
 
             function onauthorized(data) {
+                g.account = data;
                 g.identity = data.loginid + ' ' + (data.fullname||'');
-                g.currency = data.currency;
-                g.balance = data.balance;
                 console.log("g is now %o", g);
                 clear_notice('info');
                 clear_notice('error');
                 $('#identity').html(g.identity);
-                $('#currency').html(g.currency);
-                $('#balance').html(g.balance);
+                $('#currency').html(g.account.currency);
+                $('#balance').html(g.account.balance);
                 var $but = $('#pauseit_form button');
                 $but.prop('started', true);
                 localStorage.setItem('token', g.token);
@@ -946,7 +961,7 @@
 
             function opensocket(opts) {
                 var handlers = {onclose:onclose,onmessage:onmessage,onopen:onopen};
-                var url = window.location.host == 'wstrade.binary.com'
+                var url = true || window.location.host == 'wstrade.binary.com'
                             ? 'wss://ws.binary.com/websockets/contracts'
                             : 'ws://www.devbin.io/websockets/contracts';
                 g.ws  = new WebSocket(url);
@@ -1046,6 +1061,7 @@
                 $('#portfol_form').submit(portfol_submit);
                 $('#pauseit_form').submit(pauseit_submit);
                 $('#mytoken_form').submit(mytoken_submit);
+                $('#statmnt_form').submit(statmnt_submit);
 
                 // make all buttons
                 $('.button').each(buttonmaker);
