@@ -467,6 +467,7 @@
                 ui.tooltip.data('symbol', symbol);
                 g.$live_symbols[symbol] = ui.tooltip;
                 //g.ws.send(JSON.stringify({ticks:symbol, count:65, end:'latest', style: 'candles'}));
+                g.ws.send(JSON.stringify({statement: {description:1}}));
                 g.ws.send(JSON.stringify({ticks:symbol, count:65, end:'latest'}));
                 g.ws.send(JSON.stringify({ticks:symbol}));
                 ui.tooltip.draggable();
@@ -496,6 +497,13 @@
                 }
 
                 // merge request and response values, and throw away msg_type (redundant)
+
+                // special cases: overloaded names in received stream
+                if (message.contracts_for) {
+                    message.contracts_for_symbol = message.echo_req.contracts_for;
+                    delete message.echo_req.contracts_for;
+                }
+
                 var data = message.echo_req;
                 delete message.echo_req;
                 delete message.msg_type;
@@ -550,8 +558,8 @@
                     return;
                 }
 
-                if (data.symbols) {
-                    g.all_symbols = data.symbols;
+                if (data.active_symbols) {
+                    g.all_symbols = data.active_symbols;
                     g.ws.send(JSON.stringify({offerings:{}}));
                     return;
                 }
@@ -577,8 +585,8 @@
                     if (g.portfolio_stats.batch_count==0) $('#portfol_form button').button('enable');
                     return;
                 }
-                if (data.contracts) {
-                    var symbol = data.contracts_for;
+                if (data.contracts_for_symbol) {
+                    var symbol = data.contracts_for_symbol;
                     console.log("contracts.  deal with %o for " + symbol, data);
                     delete data.contracts_for;
                     g.limits_for[symbol] = data.contracts;
