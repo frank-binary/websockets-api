@@ -51,3 +51,10 @@ h2.livesym              { margin-top: 1px }
 .ui-livesym-ttip        { max-width: 220px; cursor: move }
 .ui-livesym-ttip .spark { cursor: none }
 .babybox                { border: 1px outset; padding: 2px 3px; cursor: pointer }
+
+#statement-ctr          { display: none }
+#statement-div          { padding: 12px }
+#statement-table        { width: 100%; padding: 12px }
+#statement-table td,
+#statement-table th     { text-align: right }
+

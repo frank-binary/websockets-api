@@ -42,13 +42,11 @@
                     <button class="button online" icon="ui-icon-suitcase" size="huge">Portfolio</button>
                 </div>
             </form>
-            <!-- soon..
             <form id="statmnt_form">
                 <div class="butonzone buttonset">
                     <button class="button online" icon="ui-icon-script" size="huge">Statement</button>
                 </div>
             </form>
-            -->
             <form id="pauseit_form">
                 <div class="butonzone buttonset">
                     <button class="button" icon="ui-icon-cancel" size="huge">Start</button>
@@ -295,9 +293,19 @@
         </div>
     </div>
 
-    <div class="ui-widget ui-widget-content ui-corner-all" id="outhalf">
+    <div class="ui-widget ui-widget-content ui-corner-all">
         <div class="ui-helper-clearfix" id="contracts">
         </div>
+    </div>
+
+    <div id="statement-ctr" class="ui-widget ui-widget-content ui-corner-all ui-helper-clearfix">
+        <div id="statement-div" class="ui-state-highlight ui-corner-all">
+            <button id="close-statement" class="right button" mute="1" icon="ui-icon-close"></button>
+            <span id="statement-words"></span>
+        </div>
+        <table class="ui-helper-clearfix" id="statement-table">
+            <tr><th>Date</th><th>Ref</th><th>Action</th><th>Amount</th><th>By</th><th>Balance</th></tr>
+        </table>
     </div>
 
     <script>
@@ -499,7 +507,7 @@
                 var message = JSON.parse(m.data);
                 if (g.options.debug) {
                     var image = $.extend(true, {}, message);
-                    console.log('msg incoming  %o', image);
+                    console.log('raw msg incoming  %o', image);
                 }
 
                 // special cases: overloaded names in received stream
@@ -508,18 +516,26 @@
                     delete message.echo_req.contracts_for;
                 }
 
-                // merge request and response values, and throw away msg_type (redundant)
+                // promote error if any; merge request and response values, throw away msg_type (redundant)
                 var data = message.echo_req;
+                var data1  = message[message.msg_type];
+                if (data1.error) data1.error = data1.error.message;
                 delete message.echo_req;
                 delete message.msg_type;
                 $.extend(data, message);
 
+                if (g.options.debug) {
+                    var image = $.extend(true, {}, message);
+                    console.log('flat msg incoming %o', image);
+                }
+
                 if (data.authorize) {
-                    if (data.error) {
-                        notice(data.error,'error');
-                        return;
-                    }
                     onauthorized(data.authorize);
+                    return;
+                }
+
+                if (data.statement) {
+                    onstatement(data.statement);
                     return;
                 }
 
@@ -532,11 +548,6 @@
                 if (data.candles) {
                     var symbol = data.ticks;
                     g.all_symbols[symbol].candles = data.candles;
-                    return;
-                }
-
-                if (data.statement) {
-                    console.log('statement info received %o', data);
                     return;
                 }
 
@@ -930,7 +941,34 @@
                 g.ws.send(JSON.stringify({authorize:g.token}));
             }
 
+            function onstatement(data) {
+                $('#statement-words').html("Last " + data.count + " transactions..");
+                var trs = '';
+                $.each(data.transactions, function(i, t) {
+                    trs += '<tr>'
+                                + '<td>' + niceDate(t.transaction_time)  + '</td>'
+                                + '<td>' + t.contract_id  + '</td>'
+                                + '<td>' + t.action_type  + '</td>'
+                                + '<td>' + t.amount  + '</td>'
+                                + '<td>' + t.who  + '</td>'
+                                + '<td>' + t.balance_after  + '</td>'
+                        + '</tr>';
+                } );
+                $('#statement-table > tr').slice(1).remove();
+                $('#statement-table > tbody > tr:first').after(trs);
+                $('#statement-ctr').show();
+                $('#statmnt_form button').button('enable');
+            }
+
+            function close_statement() {
+                $('#statement-ctr').hide();
+            }
+
             function onauthorized(data) {
+                if (data.error) {
+                    notice(data.error,'error');
+                    return;
+                }
                 g.account = data;
                 g.identity = data.loginid + ' ' + (data.fullname||'');
                 console.log("g is now %o", g);
@@ -961,7 +999,7 @@
 
             function opensocket(opts) {
                 var handlers = {onclose:onclose,onmessage:onmessage,onopen:onopen};
-                var url = true || window.location.host == 'wstrade.binary.com'
+                var url = window.location.host == 'wstrade.binary.com'
                             ? 'wss://ws.binary.com/websockets/contracts'
                             : 'ws://www.devbin.io/websockets/contracts';
                 g.ws  = new WebSocket(url);
@@ -1062,6 +1100,9 @@
                 $('#pauseit_form').submit(pauseit_submit);
                 $('#mytoken_form').submit(mytoken_submit);
                 $('#statmnt_form').submit(statmnt_submit);
+
+                // statement
+                $('#close-statement').click(close_statement);
 
                 // make all buttons
                 $('.button').each(buttonmaker);
